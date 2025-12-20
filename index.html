@@ -189,30 +189,69 @@
         .btn-success { background: #27ae60; color: white; }
         button:hover { opacity: 0.9; }
 
-        /* STATUSLEISTE */
+        /* NEUE STATUSLEISTE MIT FORTSCHRITTSBALKEN */
         .audit-status {
-            display: flex;
-            justify-content: space-between;
             margin-bottom: 12px;
-            font-size: 1.0em;
+            font-size: 0.9em;
             background: #f8f9fa;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
             border: 1px solid #ddd;
-            flex-wrap: nowrap;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
-        .audit-status span {
+        
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .status-text {
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-text strong {
+            color: #3498db;
+        }
+        
+        .progress-container {
             flex: 1;
-            text-align: center;
-            min-width: 0;
-            padding: 0 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            min-width: 200px;
+            max-width: 400px;
         }
-        .status-separator {
-            color: #bdc3c7;
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .progress-text {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8em;
+            color: #666;
             font-weight: bold;
         }
 
@@ -623,7 +662,7 @@
             font-weight: bold;
         }
 
-        /* BERICHTSANZEIGE - OPTIMIERT FÜR A4 */
+        /* BERICHTSANZEIGE - OPTIMIERT FÜR A4 (IMMER HELL) */
         .report-overlay {
             display: none;
             position: fixed;
@@ -639,21 +678,53 @@
         }
         
         .report-container {
-            background: white;
+            background: white !important;
+            color: #000 !important;
             width: 95%;
             max-width: 800px;
             margin: 0 auto 20px auto;
             border-radius: 0;
             font-family: 'Arial', sans-serif;
             position: relative;
-            padding: 15px;
+            padding: 20px;
             box-shadow: 0 5px 30px rgba(0,0,0,0.5);
             min-height: 297mm;
             max-height: 297mm;
             overflow-y: auto;
         }
         
-        /* KLEINERER KOPF - NUR 2 ZEILEN */
+        /* DISKRETER SCHLIEßEN-BUTTON (WIRD NICHT GEDRUCKT) */
+        .close-report-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .close-report-btn:hover {
+            opacity: 1;
+        }
+        
+        /* Wird beim Druck ausgeblendet */
+        @media print {
+            .close-report-btn {
+                display: none !important;
+            }
+        }
+        
         .report-header {
             border-bottom: 2px solid #000;
             padding-bottom: 5px;
@@ -667,14 +738,14 @@
         .report-header h2 {
             font-size: 16px !important;
             margin: 0 0 2px 0;
-            color: #000;
+            color: #000 !important;
             line-height: 1.2;
         }
         
         .company-info {
             font-size: 11px;
             margin: 1px 0;
-            color: #333;
+            color: #333 !important;
         }
         
         /* Tabellen - KOMPAKTER */
@@ -693,7 +764,7 @@
         }
         
         .person-table th {
-            background: #f0f0f0;
+            background: #f0f0f0 !important;
             font-weight: bold;
             text-align: left;
         }
@@ -714,7 +785,7 @@
         .details-table td:first-child {
             font-weight: bold;
             width: 25%;
-            background: #f9f9f9;
+            background: #f9f9f9 !important;
         }
         
         /* Ergebnisse - KOMPAKTER */
@@ -739,17 +810,17 @@
         
         .question-item.ok {
             border-left: 2px solid #00a000;
-            background: #f0fff0;
+            background: #f0fff0 !important;
         }
         
         .question-item.not-ok {
             border-left: 2px solid #ff0000;
-            background: #fff0f0;
+            background: #fff0f0 !important;
         }
         
         .question-id {
             font-weight: bold;
-            color: #000;
+            color: #000 !important;
             font-size: 10px;
         }
         
@@ -772,17 +843,17 @@
         }
         
         .final-result-box.passed {
-            background: #e0ffe0;
+            background: #e0ffe0 !important;
             border-color: #00a000;
         }
         
         .final-result-box.failed {
-            background: #ffe0e0;
+            background: #ffe0e0 !important;
             border-color: #ff0000;
         }
         
         .final-result-box.warning {
-            background: #fff8e0;
+            background: #fff8e0 !important;
             border-color: #ffaa00;
         }
         
@@ -809,40 +880,7 @@
             min-height: 40px;
         }
         
-        /* BERICHTS ACTIONS - DISKRETER */
-        .report-actions {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 1001;
-            background: rgba(255,255,255,0.9);
-            padding: 6px 12px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-        
-        .report-actions:hover {
-            opacity: 1;
-        }
-        
-        .btn-close-report {
-            padding: 6px 10px !important;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-            background: white;
-            color: #333;
-            min-width: auto !important;
-        }
-
-        /* AUTORISIERUNGS-BERICHT */
+        /* AUTORISIERUNGS-BERICHT (IMMER HELL) */
         .authorization-header {
             text-align: center;
             border-bottom: 3px solid #000;
@@ -853,6 +891,7 @@
         .authorization-header h1 {
             font-size: 24px;
             margin: 0 0 10px 0;
+            color: #000 !important;
         }
         
         .authorization-text-box {
@@ -861,7 +900,7 @@
             margin: 20px 0;
             font-size: 14px;
             line-height: 1.5;
-            background: #f9f9f9;
+            background: #f9f9f9 !important;
             min-height: 100px;
         }
         
@@ -892,6 +931,357 @@
             color: #7f8c8d;
         }
 
+        /* DARK MODE - WIRD AUTOMATISCH ANGEWENDET, WENN SYSTEM AUF DARK STEHT */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #e0e0e0;
+            }
+            
+            .container {
+                background: #1e1e1e;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            }
+            
+            header {
+                border-bottom-color: #444;
+            }
+            
+            h1 {
+                color: #ffffff;
+            }
+            
+            .subtitle {
+                color: #b0b0b0;
+            }
+            
+            /* MODAL DARK MODE */
+            .custom-modal-content {
+                background: #2d2d2d;
+                color: #e0e0e0;
+            }
+            
+            /* AUDIT BUTTONS DARK MODE */
+            .audit-btn.wirbelstrom { 
+                background: #2980b9;
+                color: white;
+            }
+            .audit-btn.magnetpulver { 
+                background: #c0392b;
+                color: white;
+            }
+            .audit-btn.nital { 
+                background: #27ae60;
+                color: white;
+            }
+            .audit-btn.ultraschall { 
+                background: #8e44ad;
+                color: white;
+            }
+            .audit-btn.disabled {
+                opacity: 0.4;
+                background: #555;
+            }
+            
+            .audit-btn .btn-progress {
+                background: rgba(255,255,255,0.1);
+            }
+            
+            /* CONTROLS DARK MODE */
+            .btn-back { background: #666; color: white; }
+            .btn-export-single { background: #219653; color: white; }
+            .btn-export-images { background: #2980b9; color: white; }
+            .btn-authorization { background: #8e44ad; color: white; }
+            .btn-report { background: #d35400; color: white; }
+            .btn-desktop { background: #7f8c8d; color: white; }
+            .btn-danger { background: #c0392b; color: white; }
+            .btn-success { background: #27ae60; color: white; }
+            
+            /* STATUSLEISTE DARK MODE */
+            .audit-status {
+                background: #2d2d2d;
+                border-color: #444;
+            }
+            
+            .status-text {
+                color: #ffffff;
+            }
+            
+            .status-text strong {
+                color: #3498db;
+            }
+            
+            .progress-bar {
+                background: #333;
+            }
+            
+            .progress-text {
+                color: #b0b0b0;
+            }
+            
+            /* KOPFDATEN SECTION DARK MODE - BESSERER KONTRAST */
+            .header-section {
+                background: #2d2d2d;
+                border-color: #2980b9;
+            }
+            
+            .header-section h3 {
+                color: #ffffff !important; /* BESSERER KONTRAST */
+                font-weight: 600;
+            }
+            
+            .header-group {
+                background: #252525;
+                border-color: #444;
+            }
+            
+            .header-group h4 {
+                color: #ffffff;
+                border-bottom-color: #444;
+            }
+            
+            .header-input {
+                background: #333;
+                border-color: #555;
+                color: #e0e0e0;
+            }
+            
+            .header-input::placeholder {
+                color: #888;
+            }
+            
+            /* FRAGEN UND SECTIONS DARK MODE */
+            .section {
+                border-color: #444;
+            }
+            
+            .section-header {
+                background: #2c3e50;
+            }
+            
+            .section-header:hover {
+                background: #34495e;
+            }
+            
+            .question {
+                background: #252525;
+                border-left-color: #666;
+            }
+            
+            .question.ok { 
+                border-left-color: #27ae60; 
+                background: rgba(39, 174, 96, 0.1);
+            }
+            
+            .question.not-ok { 
+                border-left-color: #e74c3c; 
+                background: rgba(231, 76, 60, 0.1);
+            }
+            
+            /* FRAGEN-ID IN WEIß (NICHT SCHWARZ) */
+            .question-id {
+                background: #3498db;
+                color: white !important; /* WICHTIG: Weiße Schrift */
+            }
+            
+            .english-translation {
+                color: #b0b0b0;
+                border-left-color: #666;
+            }
+            
+            /* JA/NEIN BUTTONS DARK MODE */
+            .verdict-btn.ok {
+                background: rgba(39, 174, 96, 0.1);
+                color: #2ecc71;
+                border-color: #27ae60;
+            }
+            
+            .verdict-btn.ok.selected {
+                background: #27ae60;
+                color: white;
+            }
+            
+            .verdict-btn.not-ok {
+                background: rgba(231, 76, 60, 0.1);
+                color: #e74c3c;
+                border-color: #e74c3c;
+            }
+            
+            .verdict-btn.not-ok.selected {
+                background: #e74c3c;
+                color: white;
+            }
+            
+            /* KOMMENTARFELDER DARK MODE */
+            .comment-label {
+                color: #ffffff;
+            }
+            
+            .comment {
+                background: #333;
+                border-color: #555;
+                color: #e0e0e0;
+            }
+            
+            .comment::placeholder {
+                color: #888;
+            }
+            
+            /* BILD-UPLOAD DARK MODE */
+            .image-upload-section {
+                background: rgba(52, 152, 219, 0.05);
+                border-color: #3498db;
+            }
+            
+            .image-upload-section h4 {
+                color: #ffffff;
+            }
+            
+            .file-input-label {
+                background: #2980b9;
+                color: white;
+            }
+            
+            .image-preview-item {
+                border-color: #666;
+                background: #333;
+            }
+            
+            .remove-image {
+                background: #c0392b;
+                color: white;
+            }
+            
+            /* GESAMTERGEBNIS DARK MODE */
+            .final-result.passed {
+                background: rgba(39, 174, 96, 0.2);
+                color: #2ecc71;
+                border-color: #27ae60;
+            }
+            
+            .final-result.failed {
+                background: rgba(231, 76, 60, 0.2);
+                color: #ff6b6b;
+                border-color: #e74c3c;
+            }
+            
+            .final-result.warning {
+                background: rgba(243, 156, 18, 0.2);
+                color: #f1c40f;
+                border-color: #f39c12;
+            }
+            
+            /* MOBILE NAVIGATION DARK MODE */
+            .mobile-nav {
+                border-top-color: #444;
+            }
+            
+            .mobile-nav button {
+                background: #666;
+                color: white;
+            }
+            
+            #mobileCounter {
+                color: #ffffff;
+            }
+            
+            /* KATEGORIEN-BUTTONS MOBILE DARK MODE */
+            .mobile-section-selector {
+                background: #2d2d2d;
+            }
+            
+            .section-btn {
+                background: #2980b9;
+                color: white;
+            }
+            
+            .section-btn.active {
+                background: #3498db;
+                font-weight: bold;
+            }
+            
+            /* BERICHTSANZEIGE DARK MODE - IMMER HELL BLEIBEN */
+            .report-overlay {
+                background: rgba(0,0,0,0.95);
+            }
+            
+            /* Die Bericht-Container bleiben immer hell - !important überschreibt Dark Mode */
+            .report-container,
+            #authorizationContainer {
+                background: white !important;
+                color: #000 !important;
+            }
+
+            /* AUSSCHLUSS für den Schließen-Button */
+            .report-container .close-report-btn,
+            #authorizationContainer .close-report-btn {
+                background: #e74c3c !important;
+                color: white !important;
+            }
+            
+            .report-header h2 {
+                color: #000 !important;
+            }
+            
+            .company-info {
+                color: #333 !important;
+            }
+            
+            .person-table th {
+                background: #f0f0f0 !important;
+            }
+            
+            .details-table td:first-child {
+                background: #f9f9f9 !important;
+            }
+            
+            .question-item.ok {
+                background: #f0fff0 !important;
+            }
+            
+            .question-item.not-ok {
+                background: #fff0f0 !important;
+            }
+            
+            .question-id {
+                color: #000 !important;
+            }
+            
+            .final-result-box.passed {
+                background: #e0ffe0 !important;
+            }
+            
+            .final-result-box.failed {
+                background: #ffe0e0 !important;
+            }
+            
+            .final-result-box.warning {
+                background: #fff8e0 !important;
+            }
+            
+            .authorization-header h1 {
+                color: #000 !important;
+            }
+            
+            .authorization-text-box {
+                background: #f9f9f9 !important;
+            }
+            
+            /* FOOTER DARK MODE */
+            footer {
+                border-top-color: #444;
+                color: #b0b0b0;
+            }
+            
+            .creator-info {
+                color: #ffffff;
+            }
+            
+            .version-info {
+                color: #888;
+            }
+        }
+
         /* MOBILE OPTIMIERUNGEN */
         @media (max-width: 768px) {
             body {
@@ -920,15 +1310,22 @@
                 margin-bottom: 6px;
             }
             
+            /* STATUSLEISTE MOBILE */
             .audit-status {
-                font-size: 0.7em;
-                padding: 6px;
-                flex-wrap: nowrap;
+                padding: 8px;
+                font-size: 0.8em;
+                gap: 6px;
             }
             
-            .audit-status span {
-                font-size: 0.65em;
-                padding: 0 2px;
+            .status-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+            
+            .progress-container {
+                min-width: 100%;
+                max-width: 100%;
             }
             
             .controls-row-1,
@@ -1140,30 +1537,44 @@
                 margin: 15px 0;
             }
             
-            /* Bericht-Schließen Button extra klein */
-            .report-actions {
-                flex-wrap: wrap;
-                justify-content: center;
-                width: 95%;
-                padding: 4px 8px;
+            /* Schließen-Button auf Mobile */
+            .close-report-btn {
+                top: 5px;
+                right: 5px;
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
             }
             
-            .report-actions button {
-                padding: 4px 8px !important;
-                font-size: 11px !important;
-                min-width: 30px !important;
+            /* DARK MODE MOBILE OPTIMIERUNG */
+            @media (prefers-color-scheme: dark) {
+                .audit-status {
+                    background: #252525;
+                }
+                
+                .header-group {
+                    background: #2d2d2d;
+                }
+                
+                .mobile-section-selector {
+                    background: #252525;
+                }
+                
+                .question-text {
+                    color: #e0e0e0;
+                }
+                
+                .english-translation {
+                    color: #b0b0b0;
+                }
             }
         }
         
         /* SEHR KLEINE DISPLAYS */
         @media (max-width: 360px) {
             .audit-status {
-                font-size: 0.6em;
-                padding: 4px;
-            }
-            
-            .audit-status span {
-                font-size: 0.55em;
+                font-size: 0.7em;
+                padding: 6px;
             }
             
             .controls-row-1 button,
@@ -1212,6 +1623,11 @@
                 padding: 6px 8px;
                 font-size: 0.75em;
             }
+            
+            /* Statusanzeige für sehr kleine Displays */
+            .progress-bar {
+                height: 8px;
+            }
         }
         
         /* DESKTOP */
@@ -1225,11 +1641,6 @@
             
             .report-container {
                 padding: 20px;
-            }
-            
-            .audit-status {
-                font-size: 0.85em;
-                padding: 10px;
             }
         }
     </style>
@@ -1378,13 +1789,19 @@
                 </div>
             </div>
 
-            <!-- Statusanzeige -->
+            <!-- NEUE STATUSLEISTE NUR MIT FORTSCHRITTSBALKEN -->
             <div class="audit-status">
-                <span class="status-part">Status: <strong id="auditStatusText">In Bearbeitung</strong></span>
-                <span class="status-separator">|</span>
-                <span class="status-part">Frage: <strong id="answeredCount">0</strong>/<strong id="totalCount">0</strong></span>
-                <span class="status-separator">|</span>
-                <span class="status-part">OK: <strong id="okCount">0</strong> ❌: <strong id="notOkCount">0</strong></span>
+                <div class="status-header">
+                    <div class="status-text">
+                        Status: <strong id="auditStatusText">In Bearbeitung</strong>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            <div class="progress-text" id="progressText">0%</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Gesamtergebnis -->
@@ -1417,23 +1834,21 @@
         </footer>
     </div>
 
-    <!-- BERICHTS OVERLAY -->
+    <!-- BERICHTS OVERLAY MIT SCHLIEßEN-BUTTON -->
     <div id="reportOverlay" class="report-overlay">
         <div class="report-container" id="reportContainer">
+            <!-- Schließen-Button (wird nicht gedruckt) -->
+            <button class="close-report-btn" onclick="closeReport()">✕</button>
             <!-- Bericht wird hier dynamisch eingefügt -->
-        </div>
-        <div class="report-actions">
-            <button class="btn-close-report" onclick="closeReport()">✕</button>
         </div>
     </div>
 
-    <!-- AUTORISIERUNGS OVERLAY -->
+    <!-- AUTORISIERUNGS OVERLAY MIT SCHLIEßEN-BUTTON -->
     <div id="authorizationOverlay" class="report-overlay">
         <div class="report-container" id="authorizationContainer">
+            <!-- Schließen-Button (wird nicht gedruckt) -->
+            <button class="close-report-btn" onclick="closeAuthorization()">✕</button>
             <!-- Autorisierung wird hier dynamisch eingefügt -->
-        </div>
-        <div class="report-actions">
-            <button class="btn-close-report" onclick="closeAuthorization()">✕</button>
         </div>
     </div>
 
@@ -2374,12 +2789,13 @@
             const answered = allQuestions.filter(q => q.verdict !== null).length;
             const ok = allQuestions.filter(q => q.verdict === 'ok').length;
             const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
+            const percent = total > 0 ? Math.round((answered / total) * 100) : 0;
             
-            document.getElementById('answeredCount').textContent = answered;
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('okCount').textContent = ok;
-            document.getElementById('notOkCount').textContent = notOk;
+            // Update Fortschrittsbalken
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = `${percent}%`;
             
+            // Update Status-Text
             let statusText = "In Bearbeitung";
             let statusColor = "#f39c12";
             
@@ -2917,7 +3333,11 @@
                 </div>
             `;
             
-            document.getElementById('reportContainer').innerHTML = reportHTML;
+            // In showReport() Funktion:
+            document.getElementById('reportContainer').innerHTML = `
+                <button class="close-report-btn" onclick="closeReport()">✕</button>
+                ${reportHTML}
+            `;
             document.getElementById('reportOverlay').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
@@ -3023,7 +3443,11 @@
                 </div>
             `;
             
-            document.getElementById('authorizationContainer').innerHTML = authorizationHTML;
+            // In showAuthorization() Funktion:
+            document.getElementById('authorizationContainer').innerHTML = `
+                <button class="close-report-btn" onclick="closeAuthorization()">✕</button>
+                ${authorizationHTML}
+            `;
             document.getElementById('authorizationOverlay').style.display = 'block';
             document.body.style.overflow = 'hidden';
         }
