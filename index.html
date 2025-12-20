@@ -688,9 +688,8 @@
             position: relative;
             padding: 20px;
             box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-            min-height: 297mm;
-            max-height: 297mm;
-            overflow-y: auto;
+            height: auto;           /* Höhe anpassen an Inhalt */
+            min-height: auto;       /* Minimale Höhe flexibel */
         }
         
         /* DISKRETER SCHLIEßEN-BUTTON (WIRD NICHT GEDRUCKT) */
@@ -1751,13 +1750,13 @@
             <!-- Mobile Kopfdaten -->
             <div class="header-section mobile-view mobile-header-section collapsed" id="mobileHeaderSection">
                 <h3>
-                    <span>📄 Audit-Daten (ausklappen für Eingabe)</span>
+                    <span>📄 Audit-Daten</span>
                     <button class="toggle-header-btn" id="mobileToggleHeader">Einblenden</button>
                 </h3>
                 <div class="header-content" id="mobileHeaderContent">
                     <div class="header-grid">
                         <div class="header-group">
-                            <h4>Operator (Level 2)</h4>
+                            <h4>Operator</h4>
                             <input type="text" class="header-input" id="mobileOperatorName" placeholder="Name">
                             <input type="text" class="header-input" id="mobileOperatorNumber" placeholder="Mitarbeiter-Nr.">
                             <input type="text" class="header-input" id="mobileOperatorCert" placeholder="Zertifikat">
@@ -1828,9 +1827,9 @@
         </div>
 
         <footer>
-            <p>ZfP Operator Audit &copy; 2026 Schaeffler</p>
+            <p>Operator Audit Tool - Schaeffler Technologies AG & Co. KG</p>
             <div class="version-info">Version AA - 10.01.2026</div>
-            <div class="creator-info">Ersteller: Daniel Häusner, WI/SW2-PQT</div>
+            <div class="creator-info">Ersteller: Häusner Daniel, WI/SW2-PQT</div>
         </footer>
     </div>
 
@@ -3286,18 +3285,7 @@
             
             reportHTML += `
                 </div>
-                
-                <!-- GESAMTERGEBNIS BOX -->
-                <div class="final-result-box ${passed ? 'passed' : notOk > 0 ? 'failed' : 'warning'}" style="margin: 20px auto;">
-                    <div style="font-size: 16px; margin-bottom: 5px;">
-                        ${passed ? '✅ Audit BESTANDEN' : notOk > 0 ? '❌ Audit NICHT BESTANDEN' : '⚠️ Tätigkeitsnachweis fehlt'}
-                    </div>
-                    <div style="font-size: 12px;">
-                        ${answered}/${total} Fragen beantwortet | 
-                        ${notOk} Frage(n) mit "Nicht OK" |
-                        ${activityProofOk ? 'Tätigkeitsnachweis vorhanden' : 'Tätigkeitsnachweis fehlt'}
-                    </div>
-                </div>
+
                 
                 <!-- UNTERSCHRIFTEN -->
                 <div class="signature-area clearfix">
@@ -3305,11 +3293,6 @@
                         <div style="font-weight: bold; margin-bottom: 10px;">Auditor</div>
                         <div class="signature-line">
                             ${headerData.auditorName || ''}<br>
-                            ${headerData.auditorDept || ''}<br>
-                            ${headerData.auditorCert || ''}
-                        </div>
-                        <div style="margin-top: 5px; font-size: 11px;">
-                            ${now.toLocaleDateString('de-DE')}
                         </div>
                     </div>
                     
@@ -3317,11 +3300,6 @@
                         <div style="font-weight: bold; margin-bottom: 10px;">NDT Expert</div>
                         <div class="signature-line">
                             ${headerData.approverName || ''}<br>
-                            ${headerData.approverDept || ''}<br>
-                            ${headerData.approverCert || ''}
-                        </div>
-                        <div style="margin-top: 5px; font-size: 11px;">
-                            ${now.toLocaleDateString('de-DE')}
                         </div>
                     </div>
                 </div>
@@ -3761,3 +3739,4 @@
     </script>
 </body>
 </html>
+
