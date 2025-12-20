@@ -1,0 +1,3339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZfP Operator Audit - Schaeffler</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 6px;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #2c3e50;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 2em;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        /* MODAL FÜR IPHONE FIX */
+        .custom-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .custom-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .custom-modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .custom-modal-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            min-width: 80px;
+        }
+        .custom-modal-btn.confirm {
+            background: #27ae60;
+            color: white;
+        }
+        .custom-modal-btn.cancel {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* AUDIT AUSWAHL */
+        .audit-selection {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .audit-selection h2 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+        .audit-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .audit-btn {
+            padding: 12px 8px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .audit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+        .audit-btn.wirbelstrom { background: #3498db; }
+        .audit-btn.magnetpulver { background: #e74c3c; }
+        .audit-btn.nital { background: #2ecc71; }
+        .audit-btn.ultraschall { background: #9b59b6; }
+        .audit-btn .btn-icon {
+            font-size: 1.6em;
+            margin-bottom: 6px;
+        }
+        .audit-btn .btn-progress {
+            margin-top: 4px;
+            font-size: 0.7em;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 8px;
+            min-width: 35px;
+        }
+        .audit-btn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .audit-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* CONTROLS */
+        .controls-row-1 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            margin-bottom: 5px;
+        }
+        
+        .controls-row-2 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3px;
+            margin-bottom: 8px;
+        }
+        
+        .controls-row-1 button,
+        .controls-row-2 button {
+            padding: 5px 4px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.65em;
+            height: 32px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        
+        .btn-back { background: #7f8c8d; color: white; }
+        .btn-export-single { background: #27ae60; color: white; }
+        .btn-export-images { background: #3498db; color: white; }
+        .btn-authorization { background: #9b59b6; color: white; }
+        .btn-report { background: #f39c12; color: white; }
+        .btn-desktop { background: #95a5a6; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        button:hover { opacity: 0.9; }
+
+        /* STATUSLEISTE */
+        .audit-status {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.8em;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+        .audit-status span {
+            flex: 1;
+            text-align: center;
+            min-width: 0;
+            padding: 0 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .status-separator {
+            color: #bdc3c7;
+            font-weight: bold;
+        }
+
+        /* KOPFDATEN SECTION */
+        .header-section {
+            background: #f8f9fa;
+            border: 1px solid #3498db;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .header-section h3 {
+            color: #2c3e50;
+            margin: 0;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .toggle-header-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            font-size: 0.6em;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            min-width: 60px;
+        }
+        .header-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .header-content.collapsed {
+            max-height: 0;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+            padding: 10px;
+        }
+        .header-group {
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .header-group h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 3px;
+            font-size: 0.9em;
+        }
+        .header-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-family: inherit;
+            font-size: 0.8em;
+            margin-bottom: 6px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .header-input:last-child {
+            margin-bottom: 0;
+        }
+
+        /* MOBILE HEADER - KOMPAKT */
+        .mobile-header-section.collapsed {
+            padding: 2px;
+        }
+        .mobile-header-section.collapsed h3 {
+            padding: 4px 6px;
+            font-size: 0.75em;
+            min-height: 24px;
+        }
+
+        /* FRAGEN UND SECTIONS */
+        .section {
+            margin-bottom: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: #34495e;
+            color: white;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .section-header:hover {
+            background: #2c3e50;
+        }
+        .section-header h2 { 
+            margin: 0; 
+            font-size: 1em;
+        }
+        .section-header span {
+            transition: transform 0.3s;
+        }
+        .section.expanded .section-header span {
+            transform: rotate(90deg);
+        }
+        .section-content {
+            padding: 10px;
+            display: none;
+        }
+        .section.expanded .section-content { 
+            display: block; 
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .question {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #95a5a6;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .question.ok { border-left-color: #27ae60; background: #f0fff4; }
+        .question.not-ok { border-left-color: #e74c3c; background: #fff0f0; }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .question-text { 
+            flex: 1; 
+            font-weight: 500;
+            font-size: 1.25em;
+            line-height: 1.4;
+        }
+        .question-id {
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 1.25em;
+            margin-left: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .english-translation {
+            font-style: italic;
+            color: #666;
+            font-size: 1.0em;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 2px solid #ddd;
+        }
+        
+        /* Ja/Nein Buttons */
+        .verdict-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .verdict-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .verdict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .verdict-btn.ok {
+            background: #e8f6f3;
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+        .verdict-btn.ok.selected {
+            background: #27ae60;
+            color: white;
+        }
+        .verdict-btn.not-ok {
+            background: #ffebee;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+        .verdict-btn.not-ok.selected {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .comment-section {
+            margin-bottom: 15px;
+        }
+        .comment-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.85em;
+        }
+        .comment {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 70px;
+            font-family: inherit;
+            font-size: 0.85em;
+            box-sizing: border-box;
+        }
+        
+        /* Bild-Upload */
+        .image-upload-section {
+            margin-top: 5px;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px dashed #3498db;
+        }
+        .image-upload-section h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .remove-image {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        
+        /* GESAMTERGEBNIS */
+        .final-result {
+            text-align: center;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: none;
+        }
+        .final-result.passed {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .final-result.failed {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .final-result.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* MOBILE ANSICHT */
+        .mobile-view { 
+            display: none; 
+        }
+        .desktop-view { 
+            display: block; 
+        }
+
+        /* MOBILE NAVIGATION */
+        .mobile-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+        }
+        .mobile-nav button {
+            padding: 10px 15px;
+            font-size: 0.8em;
+            min-width: 80px;
+            border: none;
+            border-radius: 4px;
+            background: #95a5a6;
+            color: white;
+            cursor: pointer;
+        }
+        #mobileCounter {
+            font-size: 0.9em;
+            padding: 0 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+        }
+
+        /* KATEGORIEN-BUTTONS FÜR MOBILE */
+        .mobile-section-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .section-btn { 
+            flex: 1; 
+            min-width: 60px; 
+            font-size: 0.7em;
+            padding: 6px 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: none;
+            border-radius: 3px;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+        .section-btn.active {
+            background: #2c3e50;
+            font-weight: bold;
+        }
+
+        /* BERICHTSANZEIGE - OPTIMIERT FÜR A4 */
+        .report-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        
+        .report-container {
+            background: white;
+            width: 95%;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            border-radius: 0;
+            font-family: 'Arial', sans-serif;
+            position: relative;
+            padding: 15px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+            min-height: 297mm;
+            max-height: 297mm;
+            overflow-y: auto;
+        }
+        
+        /* KLEINERER KOPF - NUR 2 ZEILEN */
+        .report-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            height: auto;
+            min-height: 10mm;
+            max-height: 15mm;
+        }
+        
+        .report-header h2 {
+            font-size: 16px !important;
+            margin: 0 0 2px 0;
+            color: #000;
+            line-height: 1.2;
+        }
+        
+        .company-info {
+            font-size: 11px;
+            margin: 1px 0;
+            color: #333;
+        }
+        
+        /* Tabellen - KOMPAKTER */
+        .person-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 10px;
+        }
+        
+        .person-table th,
+        .person-table td {
+            border: 1px solid #000;
+            padding: 6px;
+            vertical-align: top;
+        }
+        
+        .person-table th {
+            background: #f0f0f0;
+            font-weight: bold;
+            text-align: left;
+        }
+        
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 10px;
+        }
+        
+        .details-table td {
+            border: 1px solid #000;
+            padding: 5px 6px;
+            vertical-align: middle;
+        }
+        
+        .details-table td:first-child {
+            font-weight: bold;
+            width: 25%;
+            background: #f9f9f9;
+        }
+        
+        /* Ergebnisse - KOMPAKTER */
+        .results-section {
+            margin: 15px 0;
+        }
+        
+        .report-section-header {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #000;
+        }
+        
+        .question-item {
+            margin: 4px 0;
+            padding: 5px;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+        
+        .question-item.ok {
+            border-left: 2px solid #00a000;
+            background: #f0fff0;
+        }
+        
+        .question-item.not-ok {
+            border-left: 2px solid #ff0000;
+            background: #fff0f0;
+        }
+        
+        .question-id {
+            font-weight: bold;
+            color: #000;
+            font-size: 10px;
+        }
+        
+        .question-comment {
+            font-style: italic;
+            color: #666;
+            margin-left: 8px;
+            font-size: 9px;
+        }
+        
+        /* GESAMTERGEBNIS IN DER MITTE */
+        .final-result-box {
+            border: 2px solid #000;
+            padding: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .final-result-box.passed {
+            background: #e0ffe0;
+            border-color: #00a000;
+        }
+        
+        .final-result-box.failed {
+            background: #ffe0e0;
+            border-color: #ff0000;
+        }
+        
+        .final-result-box.warning {
+            background: #fff8e0;
+            border-color: #ffaa00;
+        }
+        
+        /* Unterschriften - BREIT */
+        .signature-area {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #000;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .signature-box {
+            flex: 1;
+            text-align: center;
+            min-width: 45%;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 40px;
+            padding-top: 8px;
+            min-height: 40px;
+        }
+        
+        /* BERICHTS ACTIONS - DISKRETER */
+        .report-actions {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 12px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .report-actions:hover {
+            opacity: 1;
+        }
+        
+        .btn-close-report {
+            padding: 6px 10px !important;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            background: white;
+            color: #333;
+            min-width: auto !important;
+        }
+
+        /* AUTORISIERUNGS-BERICHT */
+        .authorization-header {
+            text-align: center;
+            border-bottom: 3px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .authorization-header h1 {
+            font-size: 24px;
+            margin: 0 0 10px 0;
+        }
+        
+        .authorization-text-box {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #f9f9f9;
+            min-height: 100px;
+        }
+        
+        /* ANSICHTS-STEUERUNG */
+        .audit-content { display: none; }
+        .audit-content.active { display: block; }
+        .audit-selection { display: none; }
+        .audit-selection.active { display: block; }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+        .creator-info {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 4px;
+            font-size: 0.9em;
+        }
+        .version-info {
+            margin-top: 2px;
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+
+        /* MOBILE OPTIMIERUNGEN */
+        @media (max-width: 768px) {
+            body {
+                padding: 4px;
+                font-size: 13px;
+            }
+            
+            .container { 
+                padding: 6px; 
+            }
+            
+            .desktop-view { 
+                display: none !important; 
+            }
+            .mobile-view { 
+                display: block !important; 
+            }
+            
+            header h1 {
+                font-size: 0.9em !important;
+                margin-bottom: 2px;
+            }
+            
+            .subtitle {
+                font-size: 0.8em;
+                margin-bottom: 6px;
+            }
+            
+            .audit-status {
+                font-size: 0.7em;
+                padding: 6px;
+                flex-wrap: nowrap;
+            }
+            
+            .audit-status span {
+                font-size: 0.65em;
+                padding: 0 2px;
+            }
+            
+            .controls-row-1,
+            .controls-row-2 {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 3px;
+            }
+            
+            .controls-row-1 button,
+            .controls-row-2 button {
+                padding: 5px 4px;
+                font-size: 0.65em;
+                height: 32px;
+                min-width: 0;
+            }
+            
+            .audit-buttons {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+            
+            .audit-btn {
+                padding: 10px 8px;
+                min-height: 70px;
+                font-size: 0.85em;
+                flex-direction: row;
+                justify-content: flex-start;
+                text-align: left;
+                padding-left: 15px;
+            }
+            
+            .audit-btn .btn-icon {
+                font-size: 1.4em;
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+            
+            .audit-btn .btn-progress {
+                margin-left: auto;
+                margin-top: 0;
+                font-size: 0.7em;
+            }
+            
+            /* MOBILE HEADER - SEHR KOMPAKT */
+            .mobile-header-section.collapsed {
+                padding: 0;
+                margin-bottom: 5px;
+                min-height: 28px;
+            }
+            
+            .mobile-header-section.collapsed h3 {
+                padding: 3px 6px;
+                font-size: 0.7em;
+                min-height: 24px;
+                margin: 0;
+            }
+            
+            .mobile-header-section h3 {
+                padding: 5px 8px;
+                font-size: 0.75em;
+                min-height: 26px;
+            }
+            
+            .toggle-header-btn {
+                padding: 2px 6px;
+                font-size: 0.55em;
+                min-width: 50px;
+            }
+            
+            .header-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content.collapsed {
+                max-height: 0;
+                overflow: hidden;
+            }
+            
+            .header-input {
+                padding: 8px 10px;
+                font-size: 0.9em;
+                margin-bottom: 8px;
+            }
+            
+            .header-group {
+                padding: 10px;
+            }
+            
+            .header-group h4 {
+                font-size: 0.85em;
+                margin-bottom: 6px;
+            }
+            
+            .question {
+                padding: 12px;
+            }
+            
+            .question-text {
+                font-size: 0.95em;
+                font-weight: 600;
+                line-height: 1.45;
+            }
+            
+            .question-id {
+                font-size: 0.8em;
+                margin-left: 8px;
+            }
+            
+            .english-translation {
+                font-size: 0.85em;
+                color: #555;
+                margin-top: 8px;
+                margin-bottom: 15px;
+                padding-left: 10px;
+                border-left: 2px solid #ddd;
+            }
+            
+            /* OK/Nicht-OK Buttons nebeneinander */
+            .verdict-options {
+                flex-direction: row !important;
+                gap: 8px;
+                margin-bottom: 12px;
+            }
+            
+            .verdict-btn {
+                flex: 1;
+                padding: 8px 6px;
+                font-size: 0.85em;
+                min-height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            /* Kommentarfeld kleiner */
+            .comment-section {
+                margin-bottom: 10px;
+            }
+            
+            .comment {
+                min-height: 40px !important;
+                padding: 8px;
+                font-size: 0.85em;
+                line-height: 1.3;
+            }
+            
+            .comment-label {
+                margin-bottom: 4px;
+                font-size: 0.8em;
+            }
+            
+            /* Bild-Upload Bereich kompakter */
+            .image-upload-section {
+                padding: 8px;
+                margin-top: 8px;
+            }
+            
+            .image-upload-section h4 {
+                font-size: 0.8em;
+                margin-bottom: 6px;
+            }
+            
+            .file-input-label {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+            
+            .image-preview-container {
+                gap: 6px;
+                margin-top: 8px;
+            }
+            
+            .image-preview-item {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .remove-image {
+                width: 18px;
+                height: 18px;
+                font-size: 0.7em;
+            }
+            
+            .mobile-nav button {
+                min-width: 70px;
+                padding: 5px 8px;
+                font-size: 0.8em;
+            }
+            
+            .report-container {
+                margin: 0;
+                padding: 10px;
+                width: 100%;
+                box-shadow: none;
+            }
+            
+            .report-header h2 {
+                font-size: 14px !important;
+            }
+            
+            .person-table,
+            .details-table {
+                font-size: 9px;
+            }
+            
+            .signature-box {
+                width: 100%;
+                float: none;
+                margin: 15px 0;
+            }
+            
+            /* Bericht-Schließen Button extra klein */
+            .report-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 95%;
+                padding: 4px 8px;
+            }
+            
+            .report-actions button {
+                padding: 4px 8px !important;
+                font-size: 11px !important;
+                min-width: 30px !important;
+            }
+        }
+        
+        /* SEHR KLEINE DISPLAYS */
+        @media (max-width: 360px) {
+            .audit-status {
+                font-size: 0.6em;
+                padding: 4px;
+            }
+            
+            .audit-status span {
+                font-size: 0.55em;
+            }
+            
+            .controls-row-1 button,
+            .controls-row-2 button {
+                padding: 4px 3px;
+                font-size: 0.6em;
+                height: 30px;
+            }
+            
+            .audit-btn {
+                padding: 8px 6px;
+                min-height: 60px;
+                font-size: 0.8em;
+            }
+            
+            .question-text {
+                font-size: 0.9em;
+            }
+            
+            /* Optimierte Buttons für sehr kleine Displays */
+            .verdict-btn {
+                padding: 6px 4px;
+                font-size: 0.8em;
+                min-height: 36px;
+            }
+            
+            .verdict-btn span {
+                font-size: 0.9em;
+                margin-right: 3px;
+            }
+            
+            /* Noch kompaktere Kommentarfelder */
+            .comment {
+                min-height: 40px !important;
+                padding: 6px;
+                font-size: 0.8em;
+            }
+            
+            .image-preview-item {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .mobile-nav button {
+                min-width: 60px;
+                padding: 6px 8px;
+                font-size: 0.75em;
+            }
+        }
+        
+        /* DESKTOP */
+        @media (min-width: 769px) {
+            .controls-row-1 button,
+            .controls-row-2 button {
+                font-size: 0.8em;
+                padding: 8px 10px;
+                height: 36px;
+            }
+            
+            .report-container {
+                padding: 20px;
+            }
+            
+            .audit-status {
+                font-size: 0.85em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- CUSTOM MODAL -->
+    <div id="customModal" class="custom-modal">
+        <div class="custom-modal-content">
+            <div id="modalMessage">Möchten Sie fortfahren?</div>
+            <div class="custom-modal-buttons">
+                <button id="modalCancelBtn" class="custom-modal-btn cancel">Nein</button>
+                <button id="modalConfirmBtn" class="custom-modal-btn confirm">Ja</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>ZfP Operator Audit</h1>
+            <div class="subtitle">Zerstörungsfreie Prüfverfahren - Operator Qualifizierung</div>
+        </header>
+
+        <!-- AUDIT AUSWAHL -->
+        <div id="auditSelection" class="audit-selection active">
+            <h2>Prüfverfahren auswählen:</h2>
+            <div class="audit-buttons">
+                <button class="audit-btn wirbelstrom" data-audit="wirbelstrom">
+                    <div class="btn-icon">⚡</div>
+                    <span>Wirbelstromprüfung</span>
+                    <div class="btn-progress" id="wirbelstromProgress">0%</div>
+                </button>
+                <button class="audit-btn magnetpulver" data-audit="magnetpulver">
+                    <div class="btn-icon">🧲</div>
+                    <span>Magnetpulverprüfung</span>
+                    <div class="btn-progress" id="magnetpulverProgress">0%</div>
+                </button>
+                <button class="audit-btn nital" data-audit="nital">
+                    <div class="btn-icon">🧪</div>
+                    <span>Nital-Ätzen</span>
+                    <div class="btn-progress" id="nitalProgress">0%</div>
+                </button>
+                <button class="audit-btn ultraschall" data-audit="ultraschall">
+                    <div class="btn-icon">📡</div>
+                    <span>Ultraschallprüfung</span>
+                    <div class="btn-progress" id="ultraschallProgress">0%</div>
+                </button>
+            </div>
+        </div>
+
+        <!-- AUDIT CONTENT -->
+        <div id="auditContent" class="audit-content">
+            <!-- CONTROLS -->
+            <div class="controls-row-1">
+                <button class="btn-back" id="backBtn">← Zurück</button>
+                <button class="btn-export-single" id="exportSingleBtn">📁 Export JSON</button>
+                <button class="btn-export-images" id="exportImagesBtn">📷 Export JSON + Bilder</button>
+                <button class="btn-authorization" id="authorizationBtn">📋 Autorisierung</button>
+            </div>
+
+            <div class="controls-row-2">
+                <button class="btn-report" id="reportBtn">📊 Auditbericht</button>
+                <button class="btn-desktop" id="toggleViewBtn">📱 Mobile</button>
+                <button class="btn-danger" id="resetBtn">🗑️ Reset Audit</button>
+                <button class="btn-success" id="uploadQuestionsBtn">📄 Upload Fragenkatalog</button>
+            </div>
+
+            <!-- KOPFDATEN DESKTOP -->
+            <div class="header-section desktop-view" id="desktopHeaderSection">
+                <h3>
+                    <span>📄 Audit-Kopfdaten</span>
+                    <button class="toggle-header-btn" id="desktopToggleHeader">Ausblenden</button>
+                </h3>
+                <div class="header-content" id="desktopHeaderContent">
+                    <div class="header-grid">
+                        <div class="header-group">
+                            <h4>Operator</h4>
+                            <input type="text" class="header-input" id="operatorName" placeholder="Name">
+                            <input type="text" class="header-input" id="operatorNumber" placeholder="Mitarbeiter-Nr.">
+                            <input type="text" class="header-input" id="operatorCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="operatorDept" placeholder="Abteilung">
+                        </div>
+                        <div class="header-group">
+                            <h4>Auditor (Level II)</h4>
+                            <input type="text" class="header-input" id="auditorName" placeholder="Name">
+                            <input type="text" class="header-input" id="auditorDept" placeholder="Abteilung">
+                            <input type="text" class="header-input" id="auditorCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="auditorPhone" placeholder="Telefon">
+                        </div>
+                        <div class="header-group">
+                            <h4>Supervisor (Level III)</h4>
+                            <input type="text" class="header-input" id="approverName" placeholder="Name">
+                            <input type="text" class="header-input" id="approverDept" placeholder="Abteilung">
+                            <input type="text" class="header-input" id="approverCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="approverPhone" placeholder="Telefon">
+                        </div>
+                        <div class="header-group">
+                            <h4>Prüfungsdetails</h4>
+                            <input type="text" class="header-input" id="reportNumber" placeholder="Prüfbericht-Nr.">
+                            <input type="text" class="header-input" id="partType" placeholder="Teiletype">
+                            <input type="text" class="header-input" id="externalStandard" placeholder="Externe Norm">
+                            <input type="text" class="header-input" id="sStandard" placeholder="S-Standard">
+                            <input type="text" class="header-input" id="workInstruction" placeholder="Lokale Instruktion">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Kopfdaten -->
+            <div class="header-section mobile-view mobile-header-section collapsed" id="mobileHeaderSection">
+                <h3>
+                    <span>📄 Audit-Daten (ausklappen für Eingabe)</span>
+                    <button class="toggle-header-btn" id="mobileToggleHeader">Einblenden</button>
+                </h3>
+                <div class="header-content" id="mobileHeaderContent">
+                    <div class="header-grid">
+                        <div class="header-group">
+                            <h4>Operator (Level 2)</h4>
+                            <input type="text" class="header-input" id="mobileOperatorName" placeholder="Name">
+                            <input type="text" class="header-input" id="mobileOperatorNumber" placeholder="Mitarbeiter-Nr.">
+                            <input type="text" class="header-input" id="mobileOperatorCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="mobileOperatorDept" placeholder="Abteilung">
+                        </div>
+                        <div class="header-group">
+                            <h4>Auditor (Level II)</h4>
+                            <input type="text" class="header-input" id="mobileAuditorName" placeholder="Name">
+                            <input type="text" class="header-input" id="mobileAuditorDept" placeholder="Abteilung">
+                            <input type="text" class="header-input" id="mobileAuditorCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="mobileAuditorPhone" placeholder="Telefon">
+                        </div>
+                        <div class="header-group">
+                            <h4>Freigeber (Level III)</h4>
+                            <input type="text" class="header-input" id="mobileApproverName" placeholder="Name">
+                            <input type="text" class="header-input" id="mobileApproverDept" placeholder="Abteilung">
+                            <input type="text" class="header-input" id="mobileApproverCert" placeholder="Zertifikat">
+                            <input type="text" class="header-input" id="mobileApproverPhone" placeholder="Telefon">
+                        </div>
+                        <div class="header-group">
+                            <h4>Prüfungsdetails</h4>
+                            <input type="text" class="header-input" id="mobileReportNumber" placeholder="Prüfbericht-Nr.">
+                            <input type="text" class="header-input" id="mobilePartType" placeholder="Teiletype">
+                            <input type="text" class="header-input" id="mobileExternalStandard" placeholder="Externe Norm">
+                            <input type="text" class="header-input" id="mobileSStandard" placeholder="S-Standard">
+                            <input type="text" class="header-input" id="mobileWorkInstruction" placeholder="Lokale Instruktion">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statusanzeige -->
+            <div class="audit-status">
+                <span class="status-part">Status: <strong id="auditStatusText">In Bearbeitung</strong></span>
+                <span class="status-separator">|</span>
+                <span class="status-part">Frage: <strong id="answeredCount">0</strong>/<strong id="totalCount">0</strong></span>
+                <span class="status-separator">|</span>
+                <span class="status-part">OK: <strong id="okCount">0</strong> ❌: <strong id="notOkCount">0</strong></span>
+            </div>
+            
+            <!-- Gesamtergebnis -->
+            <div id="finalResult" class="final-result">
+                <div id="resultIcon" style="font-size: 1.2em; margin-bottom: 5px;"></div>
+                <div id="resultText" style="font-size: 0.9em;"></div>
+            </div>
+
+            <!-- Desktop Ansicht -->
+            <div class="desktop-view" id="desktopView">
+                <div id="auditSections"></div>
+            </div>
+
+            <!-- Mobile Ansicht -->
+            <div class="mobile-view" id="mobileView">
+                <div class="mobile-section-selector" id="sectionSelector"></div>
+                <div id="mobileQuestions"></div>
+                <div class="mobile-nav">
+                    <button class="btn-secondary" id="prevBtn">← Zurück</button>
+                    <span id="mobileCounter">1/1</span>
+                    <button class="btn-secondary" id="nextBtn">Weiter →</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>ZfP Operator Audit &copy; 2026 Schaeffler</p>
+            <div class="version-info">Version AA - 10.01.2026</div>
+            <div class="creator-info">Ersteller: Daniel Häusner, WI/SW2-PQT</div>
+        </footer>
+    </div>
+
+    <!-- BERICHTS OVERLAY -->
+    <div id="reportOverlay" class="report-overlay">
+        <div class="report-container" id="reportContainer">
+            <!-- Bericht wird hier dynamisch eingefügt -->
+        </div>
+        <div class="report-actions">
+            <button class="btn-close-report" onclick="closeReport()">✕</button>
+        </div>
+    </div>
+
+    <!-- AUTORISIERUNGS OVERLAY -->
+    <div id="authorizationOverlay" class="report-overlay">
+        <div class="report-container" id="authorizationContainer">
+            <!-- Autorisierung wird hier dynamisch eingefügt -->
+        </div>
+        <div class="report-actions">
+            <button class="btn-close-report" onclick="closeAuthorization()">✕</button>
+        </div>
+    </div>
+
+    <!-- VERSTECKTE INPUTS -->
+    <input type="file" id="fileLoader" accept=".json" style="display: none;">
+    <input type="file" id="questionsLoader" accept=".json" style="display: none;">
+
+    <script>
+        // === KONSTANTEN ===
+        const AUDIT_TYPES = {
+            wirbelstrom: { 
+                id: 'wirbelstrom', 
+                title: 'Wirbelstromprüfung', 
+                short: 'ET', 
+                color: '#3498db', 
+                icon: '⚡',
+                norm: '',
+                instruction: ''
+            },
+            magnetpulver: { 
+                id: 'magnetpulver', 
+                title: 'Magnetpulverprüfung', 
+                short: 'MT', 
+                color: '#e74c3c', 
+                icon: '🧲',
+                norm: '',
+                instruction: ''
+            },
+            nital: { 
+                id: 'nital', 
+                title: 'Nital-Ätzen', 
+                short: 'NE', 
+                color: '#2ecc71', 
+                icon: '🧪',
+                norm: '',
+                instruction: ''
+            },
+            ultraschall: { 
+                id: 'ultraschall', 
+                title: 'Ultraschallprüfung', 
+                short: 'UT', 
+                color: '#9b59b6', 
+                icon: '📡',
+                norm: '',
+                instruction: ''
+            }
+        };
+
+        // BEREINIGTE UND VERBESSERTE FRAGENSTRUKTUR
+        const STANDARD_QUESTIONS = {
+            wirbelstrom: [
+                {
+                    title: "1. Qualifikation & Dokumentation",
+                    short: "Qualifikation",
+                    questions: [
+                        { 
+                            id: "ET-1.1", 
+                            text: "Sehtest gültig (≤12 Monate) und Zertifikat vorgelegt",
+                            english: "Eye test valid (≤12 months) and certificate presented"
+                        },
+                        { 
+                            id: "ET-1.2", 
+                            text: "ET Level 2 Zertifikat ISO/ASNT-konform vorhanden",
+                            english: "ET Level 2 certificate ISO/ASNT compliant available"
+                        },
+                        { 
+                            id: "ET-1.3", 
+                            text: "Kenntnis der Norm S285066 und Arbeitsanweisung INFSW_17005 nachgewiesen",
+                            english: "Knowledge of standard S285066 and work instruction INFSW_17005 demonstrated"
+                        }
+                    ]
+                },
+                {
+                    title: "2. Geräteeinrichtung & Kalibrierung",
+                    short: "Geräteeinrichtung",
+                    questions: [
+                        { 
+                            id: "ET-2.1", 
+                            text: "Tägliche Plausibilitätsprüfung korrekt durchgeführt und dokumentiert",
+                            english: "Daily plausibility check correctly performed and documented"
+                        },
+                        { 
+                            id: "ET-2.2", 
+                            text: "Referenzteile gemäß Norm vorhanden und korrekt gelagert",
+                            english: "Reference parts according to standard available and correctly stored"
+                        },
+                        { 
+                            id: "ET-2.3", 
+                            text: "Geräteparameter entsprechend Prüfanweisung eingestellt",
+                            english: "Device parameters set according to inspection instruction"
+                        }
+                    ]
+                },
+                {
+                    title: "3. Prüfdurchführung & Bewertung",
+                    short: "Prüfdurchführung",
+                    questions: [
+                        { 
+                            id: "ET-3.1", 
+                            text: "Systematische Prüfung aller definierten Bereiche",
+                            english: "Systematic inspection of all defined areas"
+                        },
+                        { 
+                            id: "ET-3.2", 
+                            text: "Korrekte Erkennung und Bewertung von Fehleranzeigen",
+                            english: "Correct detection and evaluation of defect indications"
+                        },
+                        { 
+                            id: "ET-3.3", 
+                            text: "n.i.O.-Teile korrekt erkannt und als 'nicht i.O.' deklariert",
+                            english: "Rejected parts correctly identified and declared as 'not OK'"
+                        },
+                        { 
+                            id: "ET-3.4", 
+                            text: "Keine Fehlbewertungen (gute Teile als n.i.O. deklariert)",
+                            english: "No false rejections (good parts declared as not OK)"
+                        }
+                    ]
+                },
+                {
+                    title: "4. Dokumentation & Qualitätssicherung",
+                    short: "Dokumentation",
+                    questions: [
+                        { 
+                            id: "ET-4.1", 
+                            text: "Vollständige und lesbare Dokumentation aller Prüfergebnisse",
+                            english: "Complete and legible documentation of all test results"
+                        },
+                        { 
+                            id: "ET-4.2", 
+                            text: "Korrekte Anwendung des Zwischenbehälter-Prinzips (Trennung i.O./n.i.O.)",
+                            english: "Correct application of intermediate container principle (separation OK/not OK)"
+                        },
+                        { 
+                            id: "ET-4.3", 
+                            text: "Entmagnetisierung bei Bedarf durchgeführt und Grenzwerte kontrolliert",
+                            english: "Demagnetization performed when required and limit values controlled"
+                        },
+                        { 
+                            id: "ET-4.4", 
+                            text: "Tätigkeitsnachweis vorhanden und vollständig dokumentiert",
+                            english: "Activity proof available and fully documented",
+                            isActivityProof: true
+                        }
+                    ]
+                }
+            ],
+            magnetpulver: [
+                {
+                    title: "1. Qualifikation & Normenkenntnis",
+                    short: "Qualifikation",
+                    questions: [
+                        { 
+                            id: "MT-1.1", 
+                            text: "Sehtest gültig (≤12 Monate) und dokumentiert",
+                            english: "Eye test valid (≤12 months) and documented"
+                        },
+                        { 
+                            id: "MT-1.2", 
+                            text: "MT Level 2 Zertifikat ISO/IASNT-konform vorhanden",
+                            english: "MT Level 2 certificate ISO/IASNT compliant available"
+                        },
+                        { 
+                            id: "MT-1.3", 
+                            text: "Kenntnis Normen (DIN EN ISO 9934, S24000-8) und Arbeitsanweisung INFSW01044",
+                            english: "Knowledge of standards (DIN EN ISO 9934, S24000-8) and work instruction INFSW01044"
+                        }
+                    ]
+                },
+                {
+                    title: "2. Geräteprüfung & Kalibrierung",
+                    short: "Geräteprüfung",
+                    questions: [
+                        { 
+                            id: "MT-2.1", 
+                            text: "UV-Lampe überprüft (Intensität, Filter) und dokumentiert",
+                            english: "UV lamp checked (intensity, filter) and documented"
+                        },
+                        { 
+                            id: "MT-2.2", 
+                            text: "UV- und Belichtungsmesser gemäß Vorgabe kalibriert",
+                            english: "UV and lux meter calibrated according to specification"
+                        },
+                        { 
+                            id: "MT-2.3", 
+                            text: "Magnetisierung für alle Ausrichtungen geprüft, Grenzwerte eingehalten",
+                            english: "Magnetization checked for all orientations, limit values maintained"
+                        },
+                        { 
+                            id: "MT-2.4", 
+                            text: "MTU-Prüfkörper 3 Kontrolle durchgeführt",
+                            english: "MTU test body 3 control performed"
+                        }
+                    ]
+                },
+                {
+                    title: "3. Prüfdurchführung & Fehlererkennung",
+                    short: "Prüfdurchführung",
+                    questions: [
+                        { 
+                            id: "MT-3.1", 
+                            text: "Vollständige Inspektion aller relevanten Oberflächen",
+                            english: "Complete inspection of all relevant surfaces"
+                        },
+                        { 
+                            id: "MT-3.2", 
+                            text: "Korrekte Interpretation von Rissanzeigen",
+                            english: "Correct interpretation of crack indications"
+                        },
+                        { 
+                            id: "MT-3.3", 
+                            text: "n.i.O.-Teile korrekt erkannt und als 'nicht i.O.' deklariert",
+                            english: "Rejected parts correctly identified and declared as 'not OK'"
+                        },
+                        { 
+                            id: "MT-3.4", 
+                            text: "Keine Fehlbewertungen (falsche Interpretationen)",
+                            english: "No mis-evaluations (false interpretations)"
+                        }
+                    ]
+                },
+                {
+                    title: "4. Dokumentation & Qualitätssicherung",
+                    short: "Dokumentation",
+                    questions: [
+                        { 
+                            id: "MT-4.1", 
+                            text: "Korrekte Verwendung der Dokumentationsvorlage",
+                            english: "Correct use of documentation template"
+                        },
+                        { 
+                            id: "MT-4.2", 
+                            text: "Lesbare Dokumentation aller Indikationen und Maßnahmen",
+                            english: "Legible documentation of all indications and measures"
+                        },
+                        { 
+                            id: "MT-4.3", 
+                            text: "Entmagnetisierung korrekt durchgeführt und dokumentiert",
+                            english: "Demagnetization correctly performed and documented"
+                        },
+                        { 
+                            id: "MT-4.4", 
+                            text: "Tätigkeitsnachweis vorhanden und vollständig dokumentiert",
+                            english: "Activity proof available and fully documented",
+                            isActivityProof: true
+                        }
+                    ]
+                }
+            ],
+            ultraschall: [
+                {
+                    title: "1. Qualifikation & Normenkenntnis",
+                    short: "Qualifikation",
+                    questions: [
+                        { 
+                            id: "UT-1.1", 
+                            text: "Sehtest gültig (≤12 Monate) und dokumentiert",
+                            english: "Eye test valid (≤12 months) and documented"
+                        },
+                        { 
+                            id: "UT-1.2", 
+                            text: "UT Level 2 Zertifikat ISO/ASNT-konform vorhanden",
+                            english: "UT Level 2 certificate ISO/ASNT compliant available"
+                        },
+                        { 
+                            id: "UT-1.3", 
+                            text: "Kenntnis Normen (DIN EN ISO 22232, S231202-5) und Arbeitsanweisungen",
+                            english: "Knowledge of standards (DIN EN ISO 22232, S231202-5) and work instructions"
+                        }
+                    ]
+                },
+                {
+                    title: "2. Kalibrierung & Geräteeinstellung",
+                    short: "Kalibrierung",
+                    questions: [
+                        { 
+                            id: "UT-2.1", 
+                            text: "Sensitivitätskalibrierung gemäß Norm durchgeführt",
+                            english: "Sensitivity calibration performed according to standard"
+                        },
+                        { 
+                            id: "UT-2.2", 
+                            text: "Distanzkalibrierung gemäß Norm durchgeführt",
+                            english: "Distance calibration performed according to standard"
+                        },
+                        { 
+                            id: "UT-2.3", 
+                            text: "Geräteeinrichtung korrekt demonstriert",
+                            english: "Device setup correctly demonstrated"
+                        }
+                    ]
+                },
+                {
+                    title: "3. Prüfdurchführung & Defekterkennung",
+                    short: "Prüfdurchführung",
+                    questions: [
+                        { 
+                            id: "UT-3.1", 
+                            text: "Systematische Prüfung aller vorgegebenen Bereiche",
+                            english: "Systematic inspection of all specified areas"
+                        },
+                        { 
+                            id: "UT-3.2", 
+                            text: "Korrekte Rückkehr zum größten Defekt für Messung",
+                            english: "Correct return to largest defect for measurement"
+                        },
+                        { 
+                            id: "UT-3.3", 
+                            text: "Genauigkeit der Tiefenmessung und Dimensionierung",
+                            english: "Accuracy of depth measurement and dimensioning"
+                        },
+                        { 
+                            id: "UT-3.4", 
+                            text: "n.i.O.-Teile korrekt erkannt und als 'nicht i.O.' deklariert",
+                            english: "Rejected parts correctly identified and declared as 'not OK'"
+                        }
+                    ]
+                },
+                {
+                    title: "4. Dokumentation & Qualitätssicherung",
+                    short: "Dokumentation",
+                    questions: [
+                        { 
+                            id: "UT-4.1", 
+                            text: "Dokumentation gemäß Arbeitsanweisung korrekt durchgeführt",
+                            english: "Documentation according to work instruction correctly performed"
+                        },
+                        { 
+                            id: "UT-4.2", 
+                            text: "Vollständige Aufzeichnung aller Prüfergebnisse",
+                            english: "Complete recording of all test results"
+                        },
+                        { 
+                            id: "UT-4.3", 
+                            text: "Klare Kennzeichnung und Trennung von n.i.O.-Teilen",
+                            english: "Clear marking and separation of rejected parts"
+                        },
+                        { 
+                            id: "UT-4.4", 
+                            text: "Tätigkeitsnachweis vorhanden und vollständig dokumentiert",
+                            english: "Activity proof available and fully documented",
+                            isActivityProof: true
+                        }
+                    ]
+                }
+            ],
+            nital: [
+                {
+                    title: "1. Qualifikation & Sicherheit",
+                    short: "Qualifikation",
+                    questions: [
+                        { 
+                            id: "NE-1.1", 
+                            text: "Sehtest gültig (≤12 Monate) und dokumentiert",
+                            english: "Eye test valid (≤12 months) and documented"
+                        },
+                        { 
+                            id: "NE-1.2", 
+                            text: "NE Level 2 Zertifikat vorhanden",
+                            english: "NE Level 2 certificate available"
+                        },
+                        { 
+                            id: "NE-1.3", 
+                            text: "Sicherheitsunterweisung für Säurehandhabung nachgewiesen",
+                            english: "Safety training for acid handling demonstrated"
+                        }
+                    ]
+                },
+                {
+                    title: "2. Prozesskontrolle & Chemikalien",
+                    short: "Prozesskontrolle",
+                    questions: [
+                        { 
+                            id: "NE-2.1", 
+                            text: "Reinigungsprozess entspricht Norm (Parameter, Ultraschall)",
+                            english: "Cleaning process complies with standard (parameters, ultrasonic)"
+                        },
+                        { 
+                            id: "NE-2.2", 
+                            text: "Ätzmittel korrekt gelagert und überwacht (chemische Analyse)",
+                            english: "Etching agent correctly stored and monitored (chemical analysis)"
+                        },
+                        { 
+                            id: "NE-2.3", 
+                            text: "Ätzparameter entsprechend Arbeitsanweisung eingehalten",
+                            english: "Etching parameters maintained according to work instruction"
+                        }
+                    ]
+                },
+                {
+                    title: "3. Prüfung & Bewertung",
+                    short: "Prüfung",
+                    questions: [
+                        { 
+                            id: "NE-3.1", 
+                            text: "Systematische Inspektion der geätzten Flächen",
+                            english: "Systematic inspection of etched surfaces"
+                        },
+                        { 
+                            id: "NE-3.2", 
+                            text: "Korrekte Bewertung von Gefügestrukturen und Anomalien",
+                            english: "Correct evaluation of microstructure and anomalies"
+                        },
+                        { 
+                            id: "NE-3.3", 
+                            text: "n.i.O.-Teile korrekt erkannt und als 'nicht i.O.' deklariert",
+                            english: "Rejected parts correctly identified and declared as 'not OK'"
+                        },
+                        { 
+                            id: "NE-3.4", 
+                            text: "Unterscheidung zwischen relevanten und nicht relevanten Anzeigen",
+                            english: "Differentiation between relevant and non-relevant indications"
+                        }
+                    ]
+                },
+                {
+                    title: "4. Dokumentation & Nachverfolgbarkeit",
+                    short: "Dokumentation",
+                    questions: [
+                        { 
+                            id: "NE-4.1", 
+                            text: "Vollständige Dokumentation aller Prozessparameter",
+                            english: "Complete documentation of all process parameters"
+                        },
+                        { 
+                            id: "NE-4.2", 
+                            text: "Nachweis der korrekten Ätzung (Bilder/Dokumentation)",
+                            english: "Proof of correct etching (pictures/documentation)"
+                        },
+                        { 
+                            id: "NE-4.3", 
+                            text: "Trennung von i.O. und n.i.O. Teilen gewährleistet",
+                            english: "Separation of OK and not OK parts ensured"
+                        },
+                        { 
+                            id: "NE-4.4", 
+                            text: "Tätigkeitsnachweis vorhanden und vollständig dokumentiert",
+                            english: "Activity proof available and fully documented",
+                            isActivityProof: true
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // === GLOBALE VARIABLEN ===
+        let currentAuditType = null;
+        let currentAuditData = null;
+        let allQuestions = [];
+        let currentMobileQuestion = 0;
+        let imageStorage = {};
+        let uploadedImages = new Set();
+        let customModalResolve = null;
+
+        // === MODAL FUNKTIONEN ===
+        function showCustomModal(message) {
+            return new Promise((resolve) => {
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('customModal').style.display = 'flex';
+                customModalResolve = resolve;
+            });
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').style.display = 'none';
+            customModalResolve = null;
+        }
+
+        // === INITIALISIERUNG ===
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+        });
+
+        function initializeApp() {
+            loadAllAuditData();
+            updateAuditProgressDisplays();
+            
+            // Modal Event Listener
+            document.getElementById('modalConfirmBtn').addEventListener('click', function() {
+                if (customModalResolve) customModalResolve(true);
+                closeCustomModal();
+            });
+            
+            document.getElementById('modalCancelBtn').addEventListener('click', function() {
+                if (customModalResolve) customModalResolve(false);
+                closeCustomModal();
+            });
+            
+            // Header Toggle Buttons
+            document.getElementById('desktopToggleHeader').addEventListener('click', toggleDesktopHeader);
+            document.getElementById('mobileToggleHeader').addEventListener('click', toggleMobileHeader);
+            
+            // Sync Header Daten
+            syncHeaderData();
+            
+            // Global Event Listener
+            setupGlobalEventListeners();
+        }
+
+        function setupGlobalEventListeners() {
+            // Section Header Klicks (Desktop)
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.section-header') && 
+                    document.getElementById('desktopView').style.display === 'block') {
+                    const header = e.target.closest('.section-header');
+                    const section = header.closest('.section');
+                    
+                    section.classList.toggle('expanded');
+                    
+                    const arrow = header.querySelector('span');
+                    if (section.classList.contains('expanded')) {
+                        arrow.style.transform = 'rotate(90deg)';
+                    } else {
+                        arrow.style.transform = 'rotate(0deg)';
+                    }
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+            
+            // Verdict Buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.verdict-btn')) {
+                    const btn = e.target.closest('.verdict-btn');
+                    const questionElement = btn.closest('.question');
+                    if (!questionElement) return;
+                    
+                    const questionId = questionElement.dataset.id;
+                    const verdict = btn.dataset.verdict;
+                    
+                    updateQuestionData(questionId, 'verdict', verdict);
+                    
+                    questionElement.classList.remove('ok', 'not-ok');
+                    questionElement.classList.add(verdict === 'ok' ? 'ok' : 'not-ok');
+                    
+                    questionElement.querySelectorAll('.verdict-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    
+                    checkAndShowFinalResult();
+                }
+                
+                // Remove Image Buttons
+                if (e.target.classList.contains('remove-image')) {
+                    const questionId = e.target.dataset.question;
+                    const imageIndex = parseInt(e.target.dataset.index);
+                    const isMobile = window.innerWidth <= 768;
+                    removeImage(questionId, imageIndex, isMobile);
+                }
+            });
+            
+            // Kommentare
+            document.addEventListener('input', function(e) {
+                if (e.target.classList.contains('comment')) {
+                    const questionId = e.target.closest('.question').dataset.id;
+                    updateQuestionData(questionId, 'comment', e.target.value);
+                }
+                
+                // Header-Daten
+                if (e.target.classList.contains('header-input')) {
+                    saveCurrentAuditData();
+                }
+            });
+            
+            // Bild-Uploads
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('image-input')) {
+                    const questionId = e.target.dataset.question;
+                    const isMobile = window.innerWidth <= 768;
+                    handleImageUpload(e, questionId, isMobile);
+                }
+            });
+        }
+
+        // === HEADER TOGGLE FUNKTIONEN ===
+        function toggleDesktopHeader() {
+            const content = document.getElementById('desktopHeaderContent');
+            const btn = document.getElementById('desktopToggleHeader');
+            
+            content.classList.toggle('collapsed');
+            
+            if (content.classList.contains('collapsed')) {
+                btn.textContent = 'Einblenden';
+            } else {
+                btn.textContent = 'Ausblenden';
+            }
+        }
+
+        function toggleMobileHeader() {
+            const section = document.getElementById('mobileHeaderSection');
+            const content = document.getElementById('mobileHeaderContent');
+            const btn = document.getElementById('mobileToggleHeader');
+            
+            section.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+            
+            if (section.classList.contains('collapsed')) {
+                btn.textContent = 'Einblenden';
+                section.style.padding = '0';
+            } else {
+                btn.textContent = 'Ausblenden';
+                section.style.padding = '';
+            }
+        }
+
+        // === HEADER DATEN SYNC ===
+        function syncHeaderData() {
+            // Mobile zu Desktop sync
+            const mobileIds = [
+                'mobileOperatorName', 'mobileOperatorNumber', 'mobileOperatorCert', 'mobileOperatorDept',
+                'mobileAuditorName', 'mobileAuditorDept', 'mobileAuditorCert', 'mobileAuditorPhone',
+                'mobileApproverName', 'mobileApproverDept', 'mobileApproverCert', 'mobileApproverPhone',
+                'mobileReportNumber', 'mobilePartType', 'mobileExternalStandard', 'mobileSStandard', 'mobileWorkInstruction'
+            ];
+            
+            mobileIds.forEach(mobileId => {
+                const mobileElement = document.getElementById(mobileId);
+                if (mobileElement) {
+                    mobileElement.addEventListener('input', function() {
+                        const desktopId = mobileId.replace('mobile', '').charAt(0).toLowerCase() + mobileId.replace('mobile', '').slice(1);
+                        const desktopElement = document.getElementById(desktopId);
+                        if (desktopElement) {
+                            desktopElement.value = this.value;
+                        }
+                        saveCurrentAuditData();
+                    });
+                }
+            });
+            
+            // Desktop zu Mobile sync
+            const desktopIds = [
+                'operatorName', 'operatorNumber', 'operatorCert', 'operatorDept',
+                'auditorName', 'auditorDept', 'auditorCert', 'auditorPhone',
+                'approverName', 'approverDept', 'approverCert', 'approverPhone',
+                'reportNumber', 'partType', 'externalStandard', 'sStandard', 'workInstruction'
+            ];
+            
+            desktopIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        const mobileId = 'mobile' + id.charAt(0).toUpperCase() + id.slice(1);
+                        const mobileElement = document.getElementById(mobileId);
+                        if (mobileElement) {
+                            mobileElement.value = this.value;
+                        }
+                        saveCurrentAuditData();
+                    });
+                }
+            });
+        }
+
+        // === RESET HEADER-FELDER ===
+        function resetAllHeaderFields() {
+            const allIds = [
+                'operatorName', 'operatorNumber', 'operatorCert', 'operatorDept',
+                'auditorName', 'auditorDept', 'auditorCert', 'auditorPhone',
+                'approverName', 'approverDept', 'approverCert', 'approverPhone',
+                'reportNumber', 'partType', 'externalStandard', 'sStandard', 'workInstruction',
+                'mobileOperatorName', 'mobileOperatorNumber', 'mobileOperatorCert', 'mobileOperatorDept',
+                'mobileAuditorName', 'mobileAuditorDept', 'mobileAuditorCert', 'mobileAuditorPhone',
+                'mobileApproverName', 'mobileApproverDept', 'mobileApproverCert', 'mobileApproverPhone',
+                'mobileReportNumber', 'mobilePartType', 'mobileExternalStandard', 'mobileSStandard', 'mobileWorkInstruction'
+            ];
+            
+            allIds.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = '';
+                }
+            });
+        }
+
+        // === AUDIT MANAGEMENT ===
+        function loadAllAuditData() {
+            Object.keys(AUDIT_TYPES).forEach(auditType => {
+                const saved = localStorage.getItem(`zfpAudit_${auditType}`);
+                if (!saved) {
+                    const sections = STANDARD_QUESTIONS[auditType];
+                    const allQuestionsForAudit = sections.flatMap(section => 
+                        section.questions.map(q => ({
+                            ...q,
+                            sectionTitle: section.title,
+                            sectionShort: section.short,
+                            verdict: null,
+                            comment: "",
+                            images: []
+                        }))
+                    );
+                    
+                    const initialData = {
+                        meta: {
+                            created: new Date().toISOString(),
+                            lastModified: new Date().toISOString(),
+                            auditType: auditType,
+                            title: AUDIT_TYPES[auditType].title,
+                            version: "2.5"
+                        },
+                        headerData: {},
+                        questions: allQuestionsForAudit,
+                        images: {}
+                    };
+                    localStorage.setItem(`zfpAudit_${auditType}`, JSON.stringify(initialData));
+                }
+            });
+        }
+
+        function getHeaderData() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                return {
+                    operatorName: document.getElementById('mobileOperatorName')?.value || '',
+                    operatorNumber: document.getElementById('mobileOperatorNumber')?.value || '',
+                    operatorCert: document.getElementById('mobileOperatorCert')?.value || '',
+                    operatorDept: document.getElementById('mobileOperatorDept')?.value || '',
+                    auditorName: document.getElementById('mobileAuditorName')?.value || '',
+                    auditorDept: document.getElementById('mobileAuditorDept')?.value || '',
+                    auditorCert: document.getElementById('mobileAuditorCert')?.value || '',
+                    auditorPhone: document.getElementById('mobileAuditorPhone')?.value || '',
+                    approverName: document.getElementById('mobileApproverName')?.value || '',
+                    approverDept: document.getElementById('mobileApproverDept')?.value || '',
+                    approverCert: document.getElementById('mobileApproverCert')?.value || '',
+                    approverPhone: document.getElementById('mobileApproverPhone')?.value || '',
+                    reportNumber: document.getElementById('mobileReportNumber')?.value || '',
+                    partType: document.getElementById('mobilePartType')?.value || '',
+                    externalStandard: document.getElementById('mobileExternalStandard')?.value || '',
+                    sStandard: document.getElementById('mobileSStandard')?.value || AUDIT_TYPES[currentAuditType]?.norm || '',
+                    workInstruction: document.getElementById('mobileWorkInstruction')?.value || AUDIT_TYPES[currentAuditType]?.instruction || ''
+                };
+            } else {
+                return {
+                    operatorName: document.getElementById('operatorName')?.value || '',
+                    operatorNumber: document.getElementById('operatorNumber')?.value || '',
+                    operatorCert: document.getElementById('operatorCert')?.value || '',
+                    operatorDept: document.getElementById('operatorDept')?.value || '',
+                    auditorName: document.getElementById('auditorName')?.value || '',
+                    auditorDept: document.getElementById('auditorDept')?.value || '',
+                    auditorCert: document.getElementById('auditorCert')?.value || '',
+                    auditorPhone: document.getElementById('auditorPhone')?.value || '',
+                    approverName: document.getElementById('approverName')?.value || '',
+                    approverDept: document.getElementById('approverDept')?.value || '',
+                    approverCert: document.getElementById('approverCert')?.value || '',
+                    approverPhone: document.getElementById('approverPhone')?.value || '',
+                    reportNumber: document.getElementById('reportNumber')?.value || '',
+                    partType: document.getElementById('partType')?.value || '',
+                    externalStandard: document.getElementById('externalStandard')?.value || '',
+                    sStandard: document.getElementById('sStandard')?.value || AUDIT_TYPES[currentAuditType]?.norm || '',
+                    workInstruction: document.getElementById('workInstruction')?.value || AUDIT_TYPES[currentAuditType]?.instruction || ''
+                };
+            }
+        }
+
+        function setHeaderData(data) {
+            if (!data) return;
+            
+            // Setze alle Felder
+            const fields = [
+                { id: 'operatorName', value: data.operatorName },
+                { id: 'operatorNumber', value: data.operatorNumber },
+                { id: 'operatorCert', value: data.operatorCert },
+                { id: 'operatorDept', value: data.operatorDept },
+                { id: 'auditorName', value: data.auditorName },
+                { id: 'auditorDept', value: data.auditorDept },
+                { id: 'auditorCert', value: data.auditorCert },
+                { id: 'auditorPhone', value: data.auditorPhone },
+                { id: 'approverName', value: data.approverName },
+                { id: 'approverDept', value: data.approverDept },
+                { id: 'approverCert', value: data.approverCert },
+                { id: 'approverPhone', value: data.approverPhone },
+                { id: 'reportNumber', value: data.reportNumber },
+                { id: 'partType', value: data.partType },
+                { id: 'externalStandard', value: data.externalStandard },
+                { id: 'sStandard', value: data.sStandard },
+                { id: 'workInstruction', value: data.workInstruction }
+            ];
+            
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                const mobileElement = document.getElementById('mobile' + field.id.charAt(0).toUpperCase() + field.id.slice(1));
+                
+                if (element && field.value !== undefined) element.value = field.value;
+                if (mobileElement && field.value !== undefined) mobileElement.value = field.value;
+            });
+        }
+
+        function startAudit(auditType) {
+            currentAuditType = auditType;
+            
+            document.getElementById('auditSelection').classList.remove('active');
+            document.getElementById('auditContent').classList.add('active');
+            document.getElementById('finalResult').style.display = 'none';
+            
+            loadCurrentAuditData();
+            
+            const auditInfo = AUDIT_TYPES[auditType];
+            document.querySelector('h1').textContent = `ZfP Audit - ${auditInfo.title}`;
+            document.querySelector('.subtitle').textContent = `Prüfverfahren: ${auditInfo.title}`;
+            
+            // Reset Header States
+            document.getElementById('desktopHeaderContent').classList.remove('collapsed');
+            document.getElementById('desktopToggleHeader').textContent = 'Ausblenden';
+            document.getElementById('mobileHeaderSection').classList.add('collapsed');
+            document.getElementById('mobileHeaderContent').classList.add('collapsed');
+            document.getElementById('mobileToggleHeader').textContent = 'Einblenden';
+            
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                document.getElementById('desktopView').style.display = 'none';
+                document.getElementById('mobileView').style.display = 'block';
+                document.getElementById('toggleViewBtn').textContent = '🖥️ Desktop';
+                renderMobileQuestion();
+            } else {
+                document.getElementById('desktopView').style.display = 'block';
+                document.getElementById('mobileView').style.display = 'none';
+                document.getElementById('toggleViewBtn').textContent = '📱 Mobile';
+                renderAuditSections();
+            }
+            
+            updateCurrentAuditProgress();
+            checkAndShowFinalResult();
+        }
+
+        function loadCurrentAuditData() {
+            const saved = localStorage.getItem(`zfpAudit_${currentAuditType}`);
+            if (saved) {
+                currentAuditData = JSON.parse(saved);
+                allQuestions = currentAuditData.questions || [];
+                imageStorage = currentAuditData.images || {};
+                
+                if (currentAuditData.headerData) {
+                    setHeaderData(currentAuditData.headerData);
+                }
+                
+                uploadedImages.clear();
+                allQuestions.forEach(question => {
+                    if (question.images && question.images.length > 0) {
+                        question.images.forEach(img => {
+                            uploadedImages.add(img);
+                        });
+                    }
+                });
+            } else {
+                const sections = STANDARD_QUESTIONS[currentAuditType];
+                allQuestions = sections.flatMap(section => 
+                    section.questions.map(q => ({
+                        ...q,
+                        sectionTitle: section.title,
+                        sectionShort: section.short,
+                        verdict: null,
+                        comment: "",
+                        images: []
+                    }))
+                );
+                
+                currentAuditData = {
+                    meta: {
+                        created: new Date().toISOString(),
+                        lastModified: new Date().toISOString(),
+                        auditType: currentAuditType,
+                        title: AUDIT_TYPES[currentAuditType].title,
+                        version: "2.5"
+                    },
+                    headerData: {},
+                    questions: allQuestions,
+                    images: {}
+                };
+            }
+        }
+
+        function saveCurrentAuditData() {
+            if (!currentAuditType || !currentAuditData) return;
+            
+            currentAuditData.questions = allQuestions;
+            currentAuditData.headerData = getHeaderData();
+            currentAuditData.images = imageStorage;
+            currentAuditData.meta.lastModified = new Date().toISOString();
+            
+            localStorage.setItem(`zfpAudit_${currentAuditType}`, JSON.stringify(currentAuditData));
+            updateAuditProgressDisplays();
+            updateCurrentAuditProgress();
+            checkAndShowFinalResult();
+        }
+
+        async function goBackToSelection() {
+            saveCurrentAuditData();
+            
+            const shouldProceed = await showCustomModal('Zurück zur Auswahl? Ungespeicherte Änderungen gehen verloren.');
+            if (!shouldProceed) return;
+            
+            currentAuditType = null;
+            currentAuditData = null;
+            allQuestions = [];
+            uploadedImages.clear();
+            
+            document.getElementById('auditSelection').classList.add('active');
+            document.getElementById('auditContent').classList.remove('active');
+            
+            document.querySelector('h1').textContent = 'ZfP Operator Audit';
+            document.querySelector('.subtitle').textContent = 'Zerstörungsfreie Prüfverfahren - Operator Qualifizierung';
+        }
+
+        // === FORTSCHRITTSANZEIGEN ===
+        function updateAuditProgressDisplays() {
+            Object.keys(AUDIT_TYPES).forEach(auditType => {
+                const progress = calculateAuditProgress(auditType);
+                const progressElement = document.getElementById(`${auditType}Progress`);
+                if (progressElement) {
+                    progressElement.textContent = `${progress.percent}%`;
+                }
+            });
+        }
+
+        function calculateAuditProgress(auditType) {
+            const saved = localStorage.getItem(`zfpAudit_${auditType}`);
+            if (!saved) {
+                const sections = STANDARD_QUESTIONS[auditType];
+                const total = sections.reduce((sum, section) => sum + section.questions.length, 0);
+                return { answered: 0, total: total, percent: 0, ok: 0, notOk: 0 };
+            }
+            
+            const data = JSON.parse(saved);
+            const questions = data.questions || [];
+            const total = questions.length;
+            const answered = questions.filter(q => q.verdict !== null).length;
+            const ok = questions.filter(q => q.verdict === 'ok').length;
+            const notOk = questions.filter(q => q.verdict === 'not-ok').length;
+            const percent = total > 0 ? Math.round((answered / total) * 100) : 0;
+            
+            return { answered, total, percent, ok, notOk };
+        }
+
+        function updateCurrentAuditProgress() {
+            if (!allQuestions.length) return;
+            
+            const total = allQuestions.length;
+            const answered = allQuestions.filter(q => q.verdict !== null).length;
+            const ok = allQuestions.filter(q => q.verdict === 'ok').length;
+            const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
+            
+            document.getElementById('answeredCount').textContent = answered;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('okCount').textContent = ok;
+            document.getElementById('notOkCount').textContent = notOk;
+            
+            let statusText = "In Bearbeitung";
+            let statusColor = "#f39c12";
+            
+            if (answered === total) {
+                const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
+                const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
+                
+                if (notOk === 0 && activityProofOk) {
+                    statusText = "✅ Bestanden";
+                    statusColor = "#27ae60";
+                } else if (notOk === 0 && !activityProofOk) {
+                    statusText = "⚠️ Tätigkeitsnachweis fehlt";
+                    statusColor = "#f39c12";
+                } else {
+                    statusText = "❌ Nicht bestanden";
+                    statusColor = "#e74c3c";
+                }
+            } else if (answered > 0) {
+                statusText = `${answered}/${total} beantwortet`;
+            }
+            
+            document.getElementById('auditStatusText').textContent = statusText;
+            document.getElementById('auditStatusText').style.color = statusColor;
+            
+            if (currentAuditType) {
+                updateAuditProgressDisplays();
+            }
+        }
+
+        // === RENDERING FUNKTIONEN ===
+        function renderAuditSections() {
+            const container = document.getElementById('auditSections');
+            container.innerHTML = '';
+            
+            if (!allQuestions.length) return;
+            
+            const sections = {};
+            allQuestions.forEach(question => {
+                if (!sections[question.sectionTitle]) {
+                    sections[question.sectionTitle] = {
+                        title: question.sectionTitle,
+                        short: question.sectionShort,
+                        questions: []
+                    };
+                }
+                sections[question.sectionTitle].questions.push(question);
+            });
+            
+            Object.values(sections).forEach(section => {
+                const sectionElement = document.createElement('div');
+                sectionElement.className = 'section';
+                sectionElement.innerHTML = `
+                    <div class="section-header">
+                        <h2>${section.title}</h2>
+                        <span>▼</span>
+                    </div>
+                    <div class="section-content">
+                        ${renderSectionQuestions(section.questions, false)}
+                    </div>
+                `;
+                container.appendChild(sectionElement);
+            });
+        }
+
+        function renderSectionQuestions(questions, isMobile) {
+            return questions.map(question => {
+                const verdict = question.verdict;
+                const questionClass = verdict === 'ok' ? 'ok' : verdict === 'not-ok' ? 'not-ok' : '';
+                const images = question.images || [];
+                const isActivityProof = question.isActivityProof || false;
+                
+                return `
+                <div class="question ${questionClass}" data-id="${question.id}">
+                    <div class="question-header">
+                        <div class="question-text">${question.text} ${isActivityProof ? '<span style="color: #e74c3c; font-size: 0.8em;">⚠️ Erforderlich für Autorisierung</span>' : ''}</div>
+                        <div class="question-id">${question.id}</div>
+                    </div>
+                    ${question.english ? `<div class="english-translation">${question.english}</div>` : ''}
+                    
+                    <div class="verdict-options">
+                        <button class="verdict-btn ok ${verdict === 'ok' ? 'selected' : ''}" data-verdict="ok">
+                            <span>✅</span> OK
+                        </button>
+                        <button class="verdict-btn not-ok ${verdict === 'not-ok' ? 'selected' : ''}" data-verdict="not-ok">
+                            <span>❌</span> Nicht OK
+                        </button>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <label class="comment-label">Kommentar:</label>
+                        <textarea class="comment" placeholder="Anmerkungen...">${question.comment || ''}</textarea>
+                    </div>
+                    
+                    ${!isMobile ? `
+                    <div class="image-upload-section">
+                        <h4>📸 Bildnachweise (optional)</h4>
+                        <div class="file-input-wrapper">
+                            <input type="file" accept="image/*" class="file-input image-input" multiple data-question="${question.id}">
+                            <span class="file-input-label">Bilder auswählen</span>
+                        </div>
+                        <div class="image-preview-container" id="preview-${question.id}">
+                            ${renderImagePreviews(images, question.id, isMobile)}
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        function renderImagePreviews(images, questionId, isMobile) {
+            return images.map((img, index) => `
+                <div class="image-preview-item">
+                    <img class="image-preview" src="${img}" alt="Bild ${index + 1}">
+                    <button class="remove-image" data-question="${questionId}" data-index="${index}">×</button>
+                </div>
+            `).join('');
+        }
+
+        // === MOBILE FUNKTIONEN ===
+        function renderMobileQuestion() {
+            if (allQuestions.length === 0) return;
+            
+            const container = document.getElementById('mobileQuestions');
+            const question = allQuestions[currentMobileQuestion];
+            if (!question) return;
+            
+            const verdict = question.verdict;
+            const questionClass = verdict === 'ok' ? 'ok' : verdict === 'not-ok' ? 'not-ok' : '';
+            const images = question.images || [];
+            const isActivityProof = question.isActivityProof || false;
+            
+            container.innerHTML = `
+                <div class="question ${questionClass}" data-id="${question.id}">
+                    <div class="question-header">
+                        <div class="question-text">${question.text} ${isActivityProof ? '<span style="color: #e74c3c; font-size: 0.7em;">⚠️ Erforderlich</span>' : ''}</div>
+                        <div class="question-id">${question.id}</div>
+                    </div>
+                    ${question.english ? `<div class="english-translation">${question.english}</div>` : ''}
+                    
+                    <div class="verdict-options">
+                        <button class="verdict-btn ok ${verdict === 'ok' ? 'selected' : ''}" data-verdict="ok">
+                            <span>✅</span> OK
+                        </button>
+                        <button class="verdict-btn not-ok ${verdict === 'not-ok' ? 'selected' : ''}" data-verdict="not-ok">
+                            <span>❌</span> Nicht OK
+                        </button>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <label class="comment-label">Kommentar:</label>
+                        <textarea class="comment" placeholder="Anmerkungen..." rows="2">${question.comment || ''}</textarea>
+                    </div>
+                    
+                    <div class="image-upload-section">
+                        <h4>📸 Bilder (optional)</h4>
+                        <div class="file-input-wrapper">
+                            <input type="file" accept="image/*" class="file-input image-input" multiple data-question="${question.id}">
+                            <span class="file-input-label">Bilder auswählen</span>
+                        </div>
+                        <div class="image-preview-container" id="mobile_preview-${question.id}">
+                            ${renderImagePreviews(images, question.id, true)}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('mobileCounter').textContent = `${currentMobileQuestion + 1}/${allQuestions.length}`;
+            renderMobileSectionSelector();
+        }
+
+        function renderMobileSectionSelector() {
+            const container = document.getElementById('sectionSelector');
+            container.innerHTML = '';
+            
+            if (!allQuestions.length) return;
+            
+            const sections = {};
+            let questionIndex = 0;
+            
+            allQuestions.forEach((question, index) => {
+                if (!sections[question.sectionTitle]) {
+                    sections[question.sectionTitle] = {
+                        title: question.sectionTitle,
+                        short: question.sectionShort,
+                        startIndex: index,
+                        count: 0
+                    };
+                }
+                sections[question.sectionTitle].count++;
+            });
+            
+            Object.values(sections).forEach((section, index) => {
+                const button = document.createElement('button');
+                button.className = 'section-btn';
+                if (currentMobileQuestion >= section.startIndex && 
+                    currentMobileQuestion < section.startIndex + section.count) {
+                    button.classList.add('active');
+                }
+                button.textContent = section.short;
+                button.title = section.title;
+                button.addEventListener('click', function() {
+                    currentMobileQuestion = section.startIndex;
+                    renderMobileQuestion();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+                container.appendChild(button);
+            });
+        }
+
+        // === HELPER FUNKTIONEN ===
+        function updateQuestionData(questionId, field, value) {
+            const question = allQuestions.find(q => q.id === questionId);
+            if (question) {
+                if (field === 'verdict') {
+                    question.verdict = value;
+                } else if (field === 'comment') {
+                    question.comment = value;
+                } else if (field === 'addImage') {
+                    if (!question.images) question.images = [];
+                    if (!uploadedImages.has(value)) {
+                        question.images.push(value);
+                        uploadedImages.add(value);
+                        imageStorage[`${questionId}_${question.images.length}`] = value;
+                    }
+                } else if (field === 'removeImage') {
+                    if (question.images) {
+                        const removedImage = question.images[value];
+                        question.images.splice(value, 1);
+                        uploadedImages.delete(removedImage);
+                        delete imageStorage[`${questionId}_${value}`];
+                    }
+                }
+                saveCurrentAuditData();
+                updateCurrentAuditProgress();
+            }
+        }
+
+        // === BILDVERARBEITUNG ===
+        async function processAndLimitImage(file) {
+            return new Promise((resolve, reject) => {
+                const maxSize = 5 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    reject(new Error(`Bild zu groß (${(file.size / 1024 / 1024).toFixed(1)}MB). Max: 5MB`));
+                    return;
+                }
+
+                const img = new Image();
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                img.onload = function() {
+                    const maxWidth = 1200;
+                    const maxHeight = 800;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width = Math.floor(width * ratio);
+                        height = Math.floor(height * ratio);
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    try {
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                        resolve(compressedDataUrl);
+                    } catch (error) {
+                        reject(new Error('Bild konnte nicht verarbeitet werden'));
+                    }
+                };
+                
+                img.onerror = function() {
+                    reject(new Error('Bild konnte nicht geladen werden'));
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        async function handleImageUpload(event, questionId, isMobile = false) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+            
+            event.target.value = '';
+            
+            const question = allQuestions.find(q => q.id === questionId);
+            if (!question.images) question.images = [];
+            
+            const previewContainerId = isMobile ? `mobile_preview-${questionId}` : `preview-${questionId}`;
+            const previewContainer = document.getElementById(previewContainerId);
+            
+            for (const file of files) {
+                if (!file.type.startsWith('image/')) {
+                    showCustomModal('❌ Nur Bilddateien erlaubt');
+                    continue;
+                }
+                
+                try {
+                    const compressedImage = await processAndLimitImage(file);
+                    
+                    if (uploadedImages.has(compressedImage)) {
+                        showCustomModal('⚠️ Dieses Bild wurde bereits hochgeladen');
+                        continue;
+                    }
+                    
+                    updateQuestionData(questionId, 'addImage', compressedImage);
+                    
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'image-preview-item';
+                    previewItem.innerHTML = `
+                        <img class="image-preview" src="${compressedImage}" alt="Bild">
+                        <button class="remove-image" data-question="${questionId}" data-index="${question.images.length - 1}">×</button>
+                    `;
+                    previewContainer.appendChild(previewItem);
+                    
+                } catch (error) {
+                    showCustomModal(`❌ ${error.message}`);
+                }
+            }
+            
+            saveCurrentAuditData();
+        }
+
+        function removeImage(questionId, imageIndex, isMobile = false) {
+            const question = allQuestions.find(q => q.id === questionId);
+            if (question && question.images) {
+                updateQuestionData(questionId, 'removeImage', imageIndex);
+                
+                if (isMobile) {
+                    renderMobileQuestion();
+                } else {
+                    const questionElement = document.querySelector(`.question[data-id="${questionId}"]`);
+                    if (questionElement) {
+                        const previewContainer = questionElement.querySelector('.image-preview-container');
+                        if (previewContainer) {
+                            previewContainer.innerHTML = renderImagePreviews(question.images, questionId, false);
+                        }
+                    }
+                }
+            }
+        }
+
+        // === ERGEBNISANZEIGE ===
+        function checkAndShowFinalResult() {
+            if (!allQuestions.length) return;
+            
+            const total = allQuestions.length;
+            const answered = allQuestions.filter(q => q.verdict !== null).length;
+            const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
+            
+            if (answered === total) {
+                const finalResult = document.getElementById('finalResult');
+                const resultIcon = document.getElementById('resultIcon');
+                const resultText = document.getElementById('resultText');
+                
+                const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
+                const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
+                
+                if (notOk === 0 && activityProofOk) {
+                    finalResult.className = 'final-result passed';
+                    resultIcon.textContent = '✅';
+                    resultText.textContent = 'Audit BESTANDEN - Tätigkeitsnachweis vorhanden';
+                } else if (notOk === 0 && !activityProofOk) {
+                    finalResult.className = 'final-result warning';
+                    resultIcon.textContent = '⚠️';
+                    resultText.textContent = 'Tätigkeitsnachweis erforderlich für Autorisierung';
+                } else {
+                    finalResult.className = 'final-result failed';
+                    resultIcon.textContent = '❌';
+                    resultText.textContent = 'Audit NICHT BESTANDEN';
+                }
+                
+                finalResult.style.display = 'block';
+            } else {
+                document.getElementById('finalResult').style.display = 'none';
+            }
+        }
+
+        // === BERICHTSANZEIGE ===
+        async function showReport() {
+            saveCurrentAuditData();
+            
+            const headerData = getHeaderData();
+            const auditInfo = AUDIT_TYPES[currentAuditType];
+            const now = new Date();
+            
+            const total = allQuestions.length;
+            const answered = allQuestions.filter(q => q.verdict !== null).length;
+            const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
+            const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
+            const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
+            const passed = answered === total && notOk === 0 && activityProofOk;
+            
+            let reportHTML = `
+                <div class="report-header">
+                    <h2>ZfP-Audit-Bericht / NDT-Operator Audit Report</h2>
+                    <div class="company-info"><strong>Prüfbericht-Nr.:</strong> ${headerData.reportNumber || 'Muster_2025_NE'}</div>
+                </div>
+                
+                <!-- PERSONEN -->
+                <table class="person-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 33%;">Bediener / Operator</th>
+                            <th style="width: 33%;">Level II Auditor</th>
+                            <th style="width: 34%;">Freigegeben Stufe III</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <strong>Name:</strong> ${headerData.operatorName || '---'}<br>
+                                <strong>Mitarbeiter-Nr.:</strong> ${headerData.operatorNumber || '---'}<br>
+                                <strong>Zertifikat:</strong> ${headerData.operatorCert || '---'}<br>
+                                <strong>Abteilung:</strong> ${headerData.operatorDept || '---'}
+                            </td>
+                            <td>
+                                <strong>Name:</strong> ${headerData.auditorName || '---'}<br>
+                                <strong>Abteilung:</strong> ${headerData.auditorDept || '---'}<br>
+                                <strong>Zertifikat:</strong> ${headerData.auditorCert || '---'}<br>
+                                <strong>Tel:</strong> ${headerData.auditorPhone || '---'}
+                            </td>
+                            <td>
+                                <strong>Name:</strong> ${headerData.approverName || '---'}<br>
+                                <strong>Abteilung:</strong> ${headerData.approverDept || '---'}<br>
+                                <strong>Zertifikat:</strong> ${headerData.approverCert || '---'}<br>
+                                <strong>Tel:</strong> ${headerData.approverPhone || '---'}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- PRÜFUNGSDETAILS -->
+                <table class="details-table">
+                    <tr>
+                        <td><strong>F-Teiletype:</strong></td>
+                        <td>${headerData.partType || '---'}</td>
+                        <td><strong>Prüfverfahren:</strong></td>
+                        <td>${auditInfo.title}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Externe Norm:</strong></td>
+                        <td>${headerData.externalStandard || '---'}</td>
+                        <td><strong>S-Standard:</strong></td>
+                        <td>${headerData.sStandard || auditInfo.norm}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Arbeitsanweisung:</strong></td>
+                        <td colspan="3">${headerData.workInstruction || auditInfo.instruction}</td>
+                    </tr>
+                </table>
+                
+                <!-- AUDIT-ERGEBNISSE -->
+                <div class="results-section">
+                    <div class="report-section-header">Audit-Ergebnisse</div>
+            `;
+            
+            const sections = {};
+            allQuestions.forEach(question => {
+                if (!sections[question.sectionTitle]) {
+                    sections[question.sectionTitle] = [];
+                }
+                sections[question.sectionTitle].push(question);
+            });
+            
+            Object.keys(sections).forEach(sectionTitle => {
+                reportHTML += `<div class="report-section-header">${sectionTitle}</div>`;
+                
+                sections[sectionTitle].forEach(question => {
+                    const verdictClass = question.verdict === 'ok' ? 'ok' : question.verdict === 'not-ok' ? 'not-ok' : '';
+                    const verdictIcon = question.verdict === 'ok' ? '✅' : question.verdict === 'not-ok' ? '❌' : '○';
+                    
+                    reportHTML += `
+                        <div class="question-item ${verdictClass}">
+                            <span class="question-id">${question.id}:</span> ${verdictIcon} ${question.text}
+                            ${question.comment ? `<div class="question-comment">Kommentar: ${question.comment}</div>` : ''}
+                        </div>
+                    `;
+                });
+            });
+            
+            reportHTML += `
+                </div>
+                
+                <!-- GESAMTERGEBNIS BOX -->
+                <div class="final-result-box ${passed ? 'passed' : notOk > 0 ? 'failed' : 'warning'}" style="margin: 20px auto;">
+                    <div style="font-size: 16px; margin-bottom: 5px;">
+                        ${passed ? '✅ Audit BESTANDEN' : notOk > 0 ? '❌ Audit NICHT BESTANDEN' : '⚠️ Tätigkeitsnachweis fehlt'}
+                    </div>
+                    <div style="font-size: 12px;">
+                        ${answered}/${total} Fragen beantwortet | 
+                        ${notOk} Frage(n) mit "Nicht OK" |
+                        ${activityProofOk ? 'Tätigkeitsnachweis vorhanden' : 'Tätigkeitsnachweis fehlt'}
+                    </div>
+                </div>
+                
+                <!-- UNTERSCHRIFTEN -->
+                <div class="signature-area clearfix">
+                    <div class="signature-box">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Auditor</div>
+                        <div class="signature-line">
+                            ${headerData.auditorName || ''}<br>
+                            ${headerData.auditorDept || ''}<br>
+                            ${headerData.auditorCert || ''}
+                        </div>
+                        <div style="margin-top: 5px; font-size: 11px;">
+                            ${now.toLocaleDateString('de-DE')}
+                        </div>
+                    </div>
+                    
+                    <div class="signature-box">
+                        <div style="font-weight: bold; margin-bottom: 10px;">NDT Expert</div>
+                        <div class="signature-line">
+                            ${headerData.approverName || ''}<br>
+                            ${headerData.approverDept || ''}<br>
+                            ${headerData.approverCert || ''}
+                        </div>
+                        <div style="margin-top: 5px; font-size: 11px;">
+                            ${now.toLocaleDateString('de-DE')}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FOOTER -->
+                <div style="margin-top: 20px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 8px;">
+                    <div>Erstellt: ${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}</div>
+                    <div>Nächste Prüfung fällig: ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</div>
+                </div>
+            `;
+            
+            document.getElementById('reportContainer').innerHTML = reportHTML;
+            document.getElementById('reportOverlay').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // === AUTORISIERUNGS-BERICHT ===
+        async function showAuthorization() {
+            saveCurrentAuditData();
+            
+            const total = allQuestions.length;
+            const answered = allQuestions.filter(q => q.verdict !== null).length;
+            const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
+            const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
+            const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
+            
+            if (answered !== total) {
+                showCustomModal('⚠️ Bitte erst alle Fragen beantworten');
+                return;
+            }
+            
+            if (notOk > 0) {
+                showCustomModal('❌ Autorisierung nicht möglich - Audit nicht bestanden');
+                return;
+            }
+            
+            if (!activityProofOk) {
+                showCustomModal('⚠️ Tätigkeitsnachweis fehlt - Autorisierung nicht möglich');
+                return;
+            }
+            
+            const headerData = getHeaderData();
+            const auditInfo = AUDIT_TYPES[currentAuditType];
+            const now = new Date();
+            
+            let werk = '';
+            if (headerData.operatorDept) {
+                if (headerData.operatorDept.includes('SW1') || headerData.operatorDept.includes('WI/SW1')) {
+                    werk = 'Werk 1';
+                } else if (headerData.operatorDept.includes('SW2') || headerData.operatorDept.includes('WI/SW2')) {
+                    werk = 'Werk 2';
+                }
+            }
+            
+            const authorizationText = `Der Prüfer hält die nach INFSW17008 für zerstörungsfreie Prüfungen geforderte Qualifikation. Er ist befähigt, ${auditInfo.title} an ${auditInfo.short} Anlagen in ${werk || 'dem Werk'} eigenverantwortlich durchzuführen. Die erteilte Autorisierung gilt für alle in der Arbeitsanweisung definierten Prüfaufgaben.`;
+            
+            let authorizationHTML = `
+                <div class="authorization-header">
+                    <h1>AUTORISIERUNG</h1>
+                    <div class="company-info">für zerstörungsfreie Prüfungen</div>
+                </div>
+                
+                <div class="authorization-info">
+                    <p><strong>Name:</strong> ${headerData.operatorName || '---'}</p>
+                    <p><strong>Personalnummer:</strong> ${headerData.operatorNumber || '---'}</p>
+                    <p><strong>Abteilung:</strong> ${headerData.operatorDept || '---'}</p>
+                    <p><strong>Verfahren:</strong> ${auditInfo.title} (${auditInfo.short})</p>
+                </div>
+                
+                <div class="authorization-text-box">
+                    ${authorizationText}
+                </div>
+                
+                <div class="authorization-details">
+                    <p><strong>Befugnisse:</strong> Autorisierung zur ${auditInfo.title} an ${auditInfo.short} Anlagen in ${werk || 'dem zuständigen Werk'}</p>
+                    <p><strong>Gültigkeitsdauer:</strong> ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</p>
+                    <p><strong>Audit-Datum:</strong> ${now.toLocaleDateString('de-DE')}</p>
+                    <p><strong>Audit-Nummer:</strong> ${headerData.reportNumber || '---'}</p>
+                </div>
+                
+                <!-- DIGITALE UNTERSCHRIFTEN -->
+                <div class="signature-fields">
+                    <div class="authorization-signature-field">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Digital signiert vom Autorisierter Mitarbeiter (oder Führungskraft):</div>
+                        <div style="min-height: 30px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                            <em>Digital signature placeholder for PDF</em>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 12px; color: #666;">
+                            Datum: __________________
+                        </div>
+                    </div>
+                    
+                    <div class="authorization-signature-field">
+                        <div style="font-weight: bold; margin-bottom: 5px;">Digital signiert vom NDT Supervisor:</div>
+                        <div style="min-height: 30px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+                            <em>Digital signature placeholder for PDF</em>
+                        </div>
+                        <div style="margin-top: 5px; font-size: 12px; color: #666;">
+                            Datum: __________________
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- STAMP -->
+                <div class="authorization-stamp-box">
+                    <div style="font-size: 18px; margin-bottom: 5px;">AUTORISIERUNG ERTEILT</div>
+                    <div style="font-size: 16px;">${now.toLocaleDateString('de-DE')}</div>
+                </div>
+                
+                <!-- FOOTER -->
+                <div style="margin-top: 30px; font-size: 11px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 10px;">
+                    <div>Diese Autorisierung basiert auf dem erfolgreichen Audit vom ${now.toLocaleDateString('de-DE')}</div>
+                    <div>Referenz: Prüfbericht-Nr. ${headerData.reportNumber || '---'}</div>
+                    <div>Gültig bis: ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</div>
+                </div>
+            `;
+            
+            document.getElementById('authorizationContainer').innerHTML = authorizationHTML;
+            document.getElementById('authorizationOverlay').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReport() {
+            document.getElementById('reportOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeAuthorization() {
+            document.getElementById('authorizationOverlay').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // === RESET FUNKTION ===
+        async function resetAudit() {
+            if (!currentAuditType) return;
+            
+            const shouldReset = await showCustomModal('Audit wirklich zurücksetzen?\nALLE Daten werden gelöscht, inklusive Header-Felder.');
+            if (!shouldReset) return;
+            
+            const sections = STANDARD_QUESTIONS[currentAuditType];
+            allQuestions = sections.flatMap(section => 
+                section.questions.map(q => ({
+                    ...q,
+                    sectionTitle: section.title,
+                    sectionShort: section.short,
+                    verdict: null,
+                    comment: "",
+                    images: []
+                }))
+            );
+            
+            resetAllHeaderFields();
+            
+            uploadedImages.clear();
+            imageStorage = {};
+            
+            currentAuditData = {
+                meta: {
+                    created: new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    auditType: currentAuditType,
+                    title: AUDIT_TYPES[currentAuditType].title,
+                    version: "2.5"
+                },
+                headerData: {},
+                questions: allQuestions,
+                images: {}
+            };
+            
+            localStorage.setItem(`zfpAudit_${currentAuditType}`, JSON.stringify(currentAuditData));
+            
+            if (window.innerWidth <= 768) {
+                currentMobileQuestion = 0;
+                renderMobileQuestion();
+            } else {
+                renderAuditSections();
+            }
+            
+            updateCurrentAuditProgress();
+            document.getElementById('finalResult').style.display = 'none';
+            
+            showCustomModal('✅ Audit wurde zurückgesetzt\nALLE Felder wurden geleert.');
+        }
+
+        // === EXPORT FUNKTIONEN ===
+        async function exportWithoutImages() {
+            if (!currentAuditType || !currentAuditData) return;
+            
+            saveCurrentAuditData();
+            
+            const exportData = { ...currentAuditData };
+            exportData.questions.forEach(q => {
+                q.images = [];
+            });
+            exportData.images = {};
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ZfP_Audit_${AUDIT_TYPES[currentAuditType].title}_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showCustomModal('✅ Audit wurde als JSON exportiert (ohne Bilder)');
+        }
+
+        async function exportWithImages() {
+            if (!currentAuditType || !currentAuditData) return;
+            
+            saveCurrentAuditData();
+            
+            const jsonData = { ...currentAuditData };
+            const jsonBlob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+            const jsonUrl = URL.createObjectURL(jsonBlob);
+            
+            const jsonLink = document.createElement('a');
+            jsonLink.href = jsonUrl;
+            jsonLink.download = `ZfP_Audit_${AUDIT_TYPES[currentAuditType].title}_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(jsonLink);
+            jsonLink.click();
+            document.body.removeChild(jsonLink);
+            URL.revokeObjectURL(jsonUrl);
+            
+            const imageCount = Object.keys(imageStorage).length;
+            if (imageCount > 0) {
+                try {
+                    let downloaded = 0;
+                    
+                    for (const [key, base64Data] of Object.entries(imageStorage)) {
+                        const byteString = atob(base64Data.split(',')[1]);
+                        const mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0];
+                        const ab = new ArrayBuffer(byteString.length);
+                        const ia = new Uint8Array(ab);
+                        
+                        for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                        }
+                        
+                        const blob = new Blob([ab], { type: mimeString });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Bild_${key}.jpg`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        
+                        downloaded++;
+                        
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    showCustomModal(`✅ Export erfolgreich\n\nJSON-Datei + ${downloaded} Bilder exportiert`);
+                    
+                } catch (error) {
+                    showCustomModal(`✅ JSON exportiert, aber Bilder konnten nicht exportiert werden:\n${error.message}`);
+                }
+            } else {
+                showCustomModal('✅ Audit wurde als JSON exportiert (keine Bilder vorhanden)');
+            }
+        }
+
+        function setupEventListeners() {
+            // Audit-Auswahl
+            document.querySelectorAll('.audit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.classList.contains('disabled')) return;
+                    startAudit(this.dataset.audit);
+                });
+            });
+
+            // Controls
+            document.getElementById('backBtn').addEventListener('click', goBackToSelection);
+            document.getElementById('exportSingleBtn').addEventListener('click', exportWithoutImages);
+            document.getElementById('exportImagesBtn').addEventListener('click', exportWithImages);
+            document.getElementById('authorizationBtn').addEventListener('click', showAuthorization);
+            document.getElementById('reportBtn').addEventListener('click', showReport);
+            document.getElementById('toggleViewBtn').addEventListener('click', toggleView);
+            document.getElementById('resetBtn').addEventListener('click', resetAudit);
+            document.getElementById('uploadQuestionsBtn').addEventListener('click', () => document.getElementById('questionsLoader').click());
+
+            // File Loader
+            document.getElementById('fileLoader').addEventListener('change', loadAuditData);
+            document.getElementById('questionsLoader').addEventListener('change', loadQuestionsData);
+
+            // Mobile Navigation
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                if (currentMobileQuestion > 0) {
+                    currentMobileQuestion--;
+                    renderMobileQuestion();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                if (currentMobileQuestion < allQuestions.length - 1) {
+                    currentMobileQuestion++;
+                    renderMobileQuestion();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            // Responsive
+            window.addEventListener('resize', handleResize);
+        }
+
+        function toggleView() {
+            const desktopView = document.getElementById('desktopView');
+            const mobileView = document.getElementById('mobileView');
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            
+            if (desktopView.style.display === 'block') {
+                desktopView.style.display = 'none';
+                mobileView.style.display = 'block';
+                toggleBtn.textContent = '🖥️ Desktop';
+                renderMobileQuestion();
+            } else {
+                desktopView.style.display = 'block';
+                mobileView.style.display = 'none';
+                toggleBtn.textContent = '📱 Mobile';
+                renderAuditSections();
+            }
+        }
+
+        function handleResize() {
+            const isMobile = window.innerWidth <= 768;
+            const desktopView = document.getElementById('desktopView');
+            const mobileView = document.getElementById('mobileView');
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            
+            if (isMobile && desktopView.style.display === 'block') {
+                desktopView.style.display = 'none';
+                mobileView.style.display = 'block';
+                toggleBtn.textContent = '🖥️ Desktop';
+                renderMobileQuestion();
+            } else if (!isMobile && mobileView.style.display === 'block') {
+                desktopView.style.display = 'block';
+                mobileView.style.display = 'none';
+                toggleBtn.textContent = '📱 Mobile';
+                renderAuditSections();
+            }
+        }
+
+        function loadAuditData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    
+                    if (!loadedData.meta || !loadedData.meta.auditType) {
+                        throw new Error('Ungültiges Audit-Datenformat');
+                    }
+                    
+                    const auditType = loadedData.meta.auditType;
+                    
+                    if (currentAuditType !== auditType) {
+                        startAudit(auditType);
+                    }
+                    
+                    currentAuditData = loadedData;
+                    allQuestions = currentAuditData.questions || [];
+                    imageStorage = currentAuditData.images || {};
+                    
+                    uploadedImages.clear();
+                    allQuestions.forEach(question => {
+                        if (question.images && question.images.length > 0) {
+                            question.images.forEach(img => {
+                                uploadedImages.add(img);
+                            });
+                        }
+                    });
+                    
+                    if (currentAuditData.headerData) {
+                        setHeaderData(currentAuditData.headerData);
+                    }
+                    
+                    localStorage.setItem(`zfpAudit_${auditType}`, JSON.stringify(currentAuditData));
+                    
+                    if (window.innerWidth <= 768) {
+                        currentMobileQuestion = 0;
+                        renderMobileQuestion();
+                    } else {
+                        renderAuditSections();
+                    }
+                    
+                    updateCurrentAuditProgress();
+                    checkAndShowFinalResult();
+                    
+                    showCustomModal(`✅ Audit geladen\n\n${loadedData.meta.title}\nLetzte Änderung: ${new Date(loadedData.meta.lastModified).toLocaleDateString()}`);
+                    
+                } catch (error) {
+                    showCustomModal(`❌ Fehler beim Laden: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function loadQuestionsData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const questionsData = JSON.parse(e.target.result);
+                    
+                    if (typeof questionsData !== 'object') {
+                        throw new Error('Ungültiges Fragenformat');
+                    }
+                    
+                    showCustomModal(`✅ Fragen geladen\n\nVerfahren: ${Object.keys(questionsData).join(', ')}`);
+                    
+                } catch (error) {
+                    showCustomModal(`❌ Fehler: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>
