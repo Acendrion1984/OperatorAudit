@@ -180,8 +180,8 @@
         }
         
         .btn-back { background: #7f8c8d; color: white; }
-        .btn-export-single { background: #27ae60; color: white; }
-        .btn-export-images { background: #3498db; color: white; }
+        .btn-export { background: #27ae60; color: white; }
+        .btn-audit-load { background: #3498db; color: white; }
         .btn-authorization { background: #9b59b6; color: white; }
         .btn-report { background: #f39c12; color: white; }
         .btn-desktop { background: #95a5a6; color: white; }
@@ -687,16 +687,22 @@
             position: relative;
             padding: 20px;
             box-shadow: 0 5px 30px rgba(0,0,0,0.5);
-            height: auto;           /* Höhe anpassen an Inhalt */
-            min-height: auto;       /* Minimale Höhe flexibel */
+            height: auto;
+            min-height: auto;
         }
         
-        /* DISKRETER SCHLIEßEN-BUTTON (WIRD NICHT GEDRUCKT) */
-        .close-report-btn {
+        /* DRUCK- UND SCHLIEßEN-BUTTONS (WERDEN NICHT GEDRUCKT) */
+        .report-action-buttons {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #e74c3c;
+            display: flex;
+            gap: 5px;
+            z-index: 1002;
+        }
+        
+        .report-action-btn {
+            background: #3498db;
             color: white;
             border: none;
             width: 30px;
@@ -707,18 +713,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1002;
             opacity: 0.7;
             transition: opacity 0.3s;
         }
         
-        .close-report-btn:hover {
+        .report-action-btn:hover {
             opacity: 1;
+        }
+        
+        .report-action-btn.print-btn {
+            background: #27ae60;
+        }
+        
+        .report-action-btn.close-btn {
+            background: #e74c3c;
         }
         
         /* Wird beim Druck ausgeblendet */
         @media print {
-            .close-report-btn {
+            .report-action-buttons {
                 display: none !important;
             }
         }
@@ -987,8 +1000,8 @@
             
             /* CONTROLS DARK MODE */
             .btn-back { background: #666; color: white; }
-            .btn-export-single { background: #219653; color: white; }
-            .btn-export-images { background: #2980b9; color: white; }
+            .btn-export { background: #219653; color: white; }
+            .btn-audit-load { background: #2980b9; color: white; }
             .btn-authorization { background: #8e44ad; color: white; }
             .btn-report { background: #d35400; color: white; }
             .btn-desktop { background: #7f8c8d; color: white; }
@@ -1024,7 +1037,7 @@
             }
             
             .header-section h3 {
-                color: #ffffff !important; /* BESSERER KONTRAST */
+                color: #ffffff !important;
                 font-weight: 600;
             }
             
@@ -1079,7 +1092,7 @@
             /* FRAGEN-ID IN WEIß (NICHT SCHWARZ) */
             .question-id {
                 background: #3498db;
-                color: white !important; /* WICHTIG: Weiße Schrift */
+                color: white !important;
             }
             
             .english-translation {
@@ -1203,18 +1216,23 @@
                 background: rgba(0,0,0,0.95);
             }
             
-            /* Die Bericht-Container bleiben immer hell - !important überschreibt Dark Mode */
             .report-container,
             #authorizationContainer {
                 background: white !important;
                 color: #000 !important;
             }
 
-            /* AUSSCHLUSS für den Schließen-Button */
-            .report-container .close-report-btn,
-            #authorizationContainer .close-report-btn {
-                background: #e74c3c !important;
+            .report-action-btn {
+                background: #2980b9 !important;
                 color: white !important;
+            }
+            
+            .report-action-btn.print-btn {
+                background: #219653 !important;
+            }
+            
+            .report-action-btn.close-btn {
+                background: #c0392b !important;
             }
             
             .report-header h2 {
@@ -1535,10 +1553,14 @@
                 margin: 15px 0;
             }
             
-            /* Schließen-Button auf Mobile */
-            .close-report-btn {
+            /* Schließen- und Druck-Buttons auf Mobile */
+            .report-action-buttons {
                 top: 5px;
                 right: 5px;
+                gap: 3px;
+            }
+            
+            .report-action-btn {
                 width: 25px;
                 height: 25px;
                 font-size: 14px;
@@ -1626,6 +1648,17 @@
             .progress-bar {
                 height: 8px;
             }
+            
+            .report-action-buttons {
+                top: 3px;
+                right: 3px;
+            }
+            
+            .report-action-btn {
+                width: 22px;
+                height: 22px;
+                font-size: 12px;
+            }
         }
         
         /* DESKTOP */
@@ -1693,8 +1726,8 @@
             <!-- CONTROLS -->
             <div class="controls-row-1">
                 <button class="btn-back" id="backBtn">← Zurück</button>
-                <button class="btn-export-single" id="exportSingleBtn">📁 Export JSON</button>
-                <button class="btn-export-images" id="exportImagesBtn">📷 Export JSON+</button>
+                <button class="btn-export" id="exportBtn">📁 Export JSON</button>
+                <button class="btn-audit-load" id="auditLoadBtn">📂 Audit Laden</button>
                 <button class="btn-authorization" id="authorizationBtn">📋 Autorisierung</button>
             </div>
 
@@ -1832,20 +1865,26 @@
         </footer>
     </div>
 
-    <!-- BERICHTS OVERLAY MIT SCHLIEßEN-BUTTON -->
+    <!-- BERICHTS OVERLAY MIT SCHLIEßEN- UND DRUCK-BUTTONS -->
     <div id="reportOverlay" class="report-overlay">
         <div class="report-container" id="reportContainer">
-            <!-- Schließen-Button (wird nicht gedruckt) -->
-            <button class="close-report-btn" onclick="closeReport()">✕</button>
+            <!-- Aktions-Buttons (werden nicht gedruckt) -->
+            <div class="report-action-buttons">
+                <button class="report-action-btn print-btn" onclick="printReport()">🖨️</button>
+                <button class="report-action-btn close-btn" onclick="closeReport()">✕</button>
+            </div>
             <!-- Bericht wird hier dynamisch eingefügt -->
         </div>
     </div>
 
-    <!-- AUTORISIERUNGS OVERLAY MIT SCHLIEßEN-BUTTON -->
+    <!-- AUTORISIERUNGS OVERLAY MIT SCHLIEßEN- UND DRUCK-BUTTONS -->
     <div id="authorizationOverlay" class="report-overlay">
         <div class="report-container" id="authorizationContainer">
-            <!-- Schließen-Button (wird nicht gedruckt) -->
-            <button class="close-report-btn" onclick="closeAuthorization()">✕</button>
+            <!-- Aktions-Buttons (werden nicht gedruckt) -->
+            <div class="report-action-buttons">
+                <button class="report-action-btn print-btn" onclick="printAuthorization()">🖨️</button>
+                <button class="report-action-btn close-btn" onclick="closeAuthorization()">✕</button>
+            </div>
             <!-- Autorisierung wird hier dynamisch eingefügt -->
         </div>
     </div>
@@ -2313,6 +2352,15 @@
         function closeCustomModal() {
             document.getElementById('customModal').style.display = 'none';
             customModalResolve = null;
+        }
+
+        // === DRUCKFUNKTIONEN ===
+        function printReport() {
+            window.print();
+        }
+
+        function printAuthorization() {
+            window.print();
         }
 
         // === INITIALISIERUNG ===
@@ -2986,7 +3034,7 @@
                 sections[question.sectionTitle].count++;
             });
             
-            Object.values(sections).forEach((section, index) => {
+            Object.values(sections).forEach((section, index) {
                 const button = document.createElement('button');
                 button.className = 'section-btn';
                 if (currentMobileQuestion >= section.startIndex && 
@@ -3310,9 +3358,11 @@
                 </div>
             `;
             
-            // In showReport() Funktion:
             document.getElementById('reportContainer').innerHTML = `
-                <button class="close-report-btn" onclick="closeReport()">✕</button>
+                <div class="report-action-buttons">
+                    <button class="report-action-btn print-btn" onclick="printReport()">🖨️</button>
+                    <button class="report-action-btn close-btn" onclick="closeReport()">✕</button>
+                </div>
                 ${reportHTML}
             `;
             document.getElementById('reportOverlay').style.display = 'block';
@@ -3420,9 +3470,11 @@
                 </div>
             `;
             
-            // In showAuthorization() Funktion:
             document.getElementById('authorizationContainer').innerHTML = `
-                <button class="close-report-btn" onclick="closeAuthorization()">✕</button>
+                <div class="report-action-buttons">
+                    <button class="report-action-btn print-btn" onclick="printAuthorization()">🖨️</button>
+                    <button class="report-action-btn close-btn" onclick="closeAuthorization()">✕</button>
+                </div>
                 ${authorizationHTML}
             `;
             document.getElementById('authorizationOverlay').style.display = 'block';
@@ -3492,31 +3544,7 @@
         }
 
         // === EXPORT FUNKTIONEN ===
-        async function exportWithoutImages() {
-            if (!currentAuditType || !currentAuditData) return;
-            
-            saveCurrentAuditData();
-            
-            const exportData = { ...currentAuditData };
-            exportData.questions.forEach(q => {
-                q.images = [];
-            });
-            exportData.images = {};
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ZfP_Audit_${AUDIT_TYPES[currentAuditType].title}_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showCustomModal('✅ Audit wurde als JSON exportiert (ohne Bilder)');
-        }
-
-        async function exportWithImages() {
+        async function exportAudit() {
             if (!currentAuditType || !currentAuditData) return;
             
             saveCurrentAuditData();
@@ -3574,6 +3602,69 @@
             }
         }
 
+        // === AUDIT LADEN FUNKTION ===
+        function loadAudit() {
+            document.getElementById('fileLoader').click();
+        }
+
+        function loadAuditData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const loadedData = JSON.parse(e.target.result);
+                    
+                    if (!loadedData.meta || !loadedData.meta.auditType) {
+                        throw new Error('Ungültiges Audit-Datenformat');
+                    }
+                    
+                    const auditType = loadedData.meta.auditType;
+                    
+                    if (currentAuditType !== auditType) {
+                        startAudit(auditType);
+                    }
+                    
+                    currentAuditData = loadedData;
+                    allQuestions = currentAuditData.questions || [];
+                    imageStorage = currentAuditData.images || {};
+                    
+                    uploadedImages.clear();
+                    allQuestions.forEach(question => {
+                        if (question.images && question.images.length > 0) {
+                            question.images.forEach(img => {
+                                uploadedImages.add(img);
+                            });
+                        }
+                    });
+                    
+                    if (currentAuditData.headerData) {
+                        setHeaderData(currentAuditData.headerData);
+                    }
+                    
+                    localStorage.setItem(`zfpAudit_${auditType}`, JSON.stringify(currentAuditData));
+                    
+                    if (window.innerWidth <= 768) {
+                        currentMobileQuestion = 0;
+                        renderMobileQuestion();
+                    } else {
+                        renderAuditSections();
+                    }
+                    
+                    updateCurrentAuditProgress();
+                    checkAndShowFinalResult();
+                    
+                    showCustomModal(`✅ Audit geladen\n\n${loadedData.meta.title}\nLetzte Änderung: ${new Date(loadedData.meta.lastModified).toLocaleDateString()}`);
+                    
+                } catch (error) {
+                    showCustomModal(`❌ Fehler beim Laden: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
         function setupEventListeners() {
             // Audit-Auswahl
             document.querySelectorAll('.audit-btn').forEach(btn => {
@@ -3585,8 +3676,8 @@
 
             // Controls
             document.getElementById('backBtn').addEventListener('click', goBackToSelection);
-            document.getElementById('exportSingleBtn').addEventListener('click', exportWithoutImages);
-            document.getElementById('exportImagesBtn').addEventListener('click', exportWithImages);
+            document.getElementById('exportBtn').addEventListener('click', exportAudit);
+            document.getElementById('auditLoadBtn').addEventListener('click', loadAudit);
             document.getElementById('authorizationBtn').addEventListener('click', showAuthorization);
             document.getElementById('reportBtn').addEventListener('click', showReport);
             document.getElementById('toggleViewBtn').addEventListener('click', toggleView);
@@ -3655,64 +3746,6 @@
             }
         }
 
-        function loadAuditData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const loadedData = JSON.parse(e.target.result);
-                    
-                    if (!loadedData.meta || !loadedData.meta.auditType) {
-                        throw new Error('Ungültiges Audit-Datenformat');
-                    }
-                    
-                    const auditType = loadedData.meta.auditType;
-                    
-                    if (currentAuditType !== auditType) {
-                        startAudit(auditType);
-                    }
-                    
-                    currentAuditData = loadedData;
-                    allQuestions = currentAuditData.questions || [];
-                    imageStorage = currentAuditData.images || {};
-                    
-                    uploadedImages.clear();
-                    allQuestions.forEach(question => {
-                        if (question.images && question.images.length > 0) {
-                            question.images.forEach(img => {
-                                uploadedImages.add(img);
-                            });
-                        }
-                    });
-                    
-                    if (currentAuditData.headerData) {
-                        setHeaderData(currentAuditData.headerData);
-                    }
-                    
-                    localStorage.setItem(`zfpAudit_${auditType}`, JSON.stringify(currentAuditData));
-                    
-                    if (window.innerWidth <= 768) {
-                        currentMobileQuestion = 0;
-                        renderMobileQuestion();
-                    } else {
-                        renderAuditSections();
-                    }
-                    
-                    updateCurrentAuditProgress();
-                    checkAndShowFinalResult();
-                    
-                    showCustomModal(`✅ Audit geladen\n\n${loadedData.meta.title}\nLetzte Änderung: ${new Date(loadedData.meta.lastModified).toLocaleDateString()}`);
-                    
-                } catch (error) {
-                    showCustomModal(`❌ Fehler beim Laden: ${error.message}`);
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
         function loadQuestionsData(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -3738,4 +3771,3 @@
     </script>
 </body>
 </html>
-
