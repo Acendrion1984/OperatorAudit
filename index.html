@@ -729,36 +729,6 @@
             background: #e74c3c;
         }
         
-        /* Wird beim Druck ausgeblendet */
-        @media print {
-            .report-action-buttons {
-                display: none !important;
-            }
-            body * {
-                visibility: hidden;
-            }
-            .report-overlay,
-            .report-overlay *,
-            .report-container,
-            .report-container * {
-                visibility: visible;
-            }
-            .report-overlay {
-                position: absolute;
-                left: 0;
-                top: 0;
-                background: white;
-                padding: 0;
-            }
-            .report-container {
-                box-shadow: none;
-                margin: 0;
-                padding: 10mm;
-                width: 100%;
-                max-width: 100%;
-            }
-        }
-        
         .report-header {
             border-bottom: 2px solid #000;
             padding-bottom: 5px;
@@ -865,35 +835,9 @@
             font-size: 9px;
         }
         
-        /* GESAMTERGEBNIS IN DER MITTE */
-        .final-result-box {
-            border: 2px solid #000;
-            padding: 12px;
-            margin: 20px 0;
-            text-align: center;
-            font-weight: bold;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        
-        .final-result-box.passed {
-            background: #e0ffe0 !important;
-            border-color: #00a000;
-        }
-        
-        .final-result-box.failed {
-            background: #ffe0e0 !important;
-            border-color: #ff0000;
-        }
-        
-        .final-result-box.warning {
-            background: #fff8e0 !important;
-            border-color: #ffaa00;
-        }
-        
-        /* Unterschriften - BREIT */
+        /* Unterschriften - PROFESSIONELL WIE IM ORIGINAL */
         .signature-area {
-            margin-top: 20px;
+            margin-top: 30px;
             padding-top: 15px;
             border-top: 1px solid #000;
             display: flex;
@@ -909,12 +853,12 @@
         
         .signature-line {
             border-top: 1px solid #000;
-            margin-top: 40px;
+            margin-top: 50px;
             padding-top: 8px;
             min-height: 40px;
         }
         
-        /* AUTORISIERUNGS-BERICHT (IMMER HELL) */
+        /* AUTORISIERUNGS-BERICHT */
         .authorization-header {
             text-align: center;
             border-bottom: 3px solid #000;
@@ -928,6 +872,18 @@
             color: #000 !important;
         }
         
+        .authorization-info {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+        }
+        
+        .authorization-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
         .authorization-text-box {
             border: 2px solid #000;
             padding: 20px;
@@ -936,6 +892,53 @@
             line-height: 1.5;
             background: #f9f9f9 !important;
             min-height: 100px;
+        }
+        
+        .authorization-details {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+        
+        .authorization-details p {
+            margin: 8px 0;
+            font-size: 13px;
+        }
+        
+        /* Autoriserungs-Unterschriften - IDENTISCH ZUM BERICHTSFORMULAR */
+        .authorization-signatures {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #000;
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+        
+        .authorization-signature-field {
+            flex: 1;
+            text-align: center;
+            min-width: 45%;
+        }
+        
+        .authorization-signature-line {
+            border-top: 1px solid #000;
+            margin-top: 50px;
+            padding-top: 8px;
+            min-height: 40px;
+        }
+        
+        .authorization-stamp-box {
+            text-align: center;
+            margin: 30px 0;
+            padding: 15px;
+            border: 3px solid #000;
+            border-radius: 10px;
+            background: #fff;
+            display: inline-block;
+            margin-left: 50%;
+            transform: translateX(-50%);
         }
         
         /* ANSICHTS-STEUERUNG */
@@ -1285,18 +1288,6 @@
                 color: #000 !important;
             }
             
-            .final-result-box.passed {
-                background: #e0ffe0 !important;
-            }
-            
-            .final-result-box.failed {
-                background: #ffe0e0 !important;
-            }
-            
-            .final-result-box.warning {
-                background: #fff8e0 !important;
-            }
-            
             .authorization-header h1 {
                 color: #000 !important;
             }
@@ -1569,10 +1560,30 @@
                 font-size: 9px;
             }
             
+            /* Unterschriften für mobile - vertikal */
+            .signature-area {
+                flex-direction: column !important;
+                gap: 15px !important;
+            }
+            
             .signature-box {
-                width: 100%;
-                float: none;
-                margin: 15px 0;
+                width: 100% !important;
+                margin-bottom: 15px !important;
+            }
+            
+            /* Autoriserung mobile */
+            .authorization-header h1 {
+                font-size: 20px !important;
+            }
+            
+            .authorization-signatures {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+            
+            .authorization-signature-field {
+                width: 100% !important;
+                margin-bottom: 20px !important;
             }
             
             /* Schließen- und Druck-Buttons auf Mobile */
@@ -1844,7 +1855,7 @@
         <div class="report-container" id="reportContainer">
             <!-- Aktions-Buttons -->
             <div class="report-action-buttons">
-                <button class="report-action-btn print-btn" onclick="window.print()">🖨️</button>
+                <button class="report-action-btn print-btn" onclick="printFullReport()">🖨️</button>
                 <button class="report-action-btn close-btn" onclick="closeReport()">✕</button>
             </div>
             <!-- Bericht wird hier dynamisch eingefügt -->
@@ -1856,7 +1867,7 @@
         <div class="report-container" id="authorizationContainer">
             <!-- Aktions-Buttons -->
             <div class="report-action-buttons">
-                <button class="report-action-btn print-btn" onclick="window.print()">🖨️</button>
+                <button class="report-action-btn print-btn" onclick="printFullAuthorization()">🖨️</button>
                 <button class="report-action-btn close-btn" onclick="closeAuthorization()">✕</button>
             </div>
             <!-- Autorisierung wird hier dynamisch eingefügt -->
@@ -2313,6 +2324,277 @@
         let imageStorage = {};
         let uploadedImages = new Set();
         let customModalResolve = null;
+
+        function printFullReport() {
+            const reportContainer = document.getElementById('reportContainer');
+            const printContent = reportContainer.innerHTML;
+            
+            // Entferne nur die Action-Buttons (keine Audit-Box mehr zu entfernen)
+            const cleanContent = printContent.replace(
+                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
+                ''
+            );
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>ZfP Audit Bericht - Schaeffler</title>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 15px; 
+                            color: #000;
+                            font-size: 10pt;
+                            line-height: 1.3;
+                        }
+                        @page { 
+                            size: A4 portrait; 
+                            margin: 15mm; 
+                        }
+                        .report-header {
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 8px;
+                            margin-bottom: 12px;
+                            text-align: center;
+                        }
+                        .report-header h2 {
+                            font-size: 14pt;
+                            margin: 0 0 4px 0;
+                            color: #000;
+                        }
+                        .company-info {
+                            font-size: 9pt;
+                            margin: 2px 0;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 8px 0;
+                            font-size: 9pt;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 5px;
+                            vertical-align: top;
+                        }
+                        th {
+                            background: #f0f0f0;
+                            font-weight: bold;
+                        }
+                        .details-table td:first-child {
+                            font-weight: bold;
+                            width: 25%;
+                            background: #f9f9f9;
+                        }
+                        .results-section {
+                            margin: 15px 0;
+                        }
+                        .report-section-header {
+                            font-size: 10pt;
+                            font-weight: bold;
+                            margin: 12px 0 6px 0;
+                            padding-bottom: 2px;
+                            border-bottom: 1px solid #000;
+                        }
+                        .question-item {
+                            margin: 3px 0;
+                            padding: 4px;
+                            font-size: 9pt;
+                            line-height: 1.2;
+                        }
+                        .question-item.ok {
+                            border-left: 2px solid #00a000;
+                            background: #f0fff0;
+                        }
+                        .question-item.not-ok {
+                            border-left: 2px solid #ff0000;
+                            background: #fff0f0;
+                        }
+                        .question-id {
+                            font-weight: bold;
+                        }
+                        .question-comment {
+                            font-style: italic;
+                            color: #666;
+                            margin-left: 8px;
+                            font-size: 8pt;
+                        }
+                        .signature-area {
+                            margin-top: 30px;
+                            padding-top: 15px;
+                            border-top: 1px solid #000;
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 20px;
+                        }
+                        .signature-box {
+                            flex: 1;
+                            text-align: center;
+                        }
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 40px;
+                            padding-top: 8px;
+                            min-height: 40px;
+                        }
+                        @media print {
+                            body { padding: 0; }
+                            .signature-area { 
+                                page-break-inside: avoid;
+                                margin-top: 40px;
+                            }
+                            table { font-size: 8pt; }
+                            .question-item { font-size: 8pt; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Kurz warten, dann drucken
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 250);
+        }
+
+        function printFullAuthorization() {
+            const authorizationContainer = document.getElementById('authorizationContainer');
+            const printContent = authorizationContainer.innerHTML;
+            
+            // Entferne die Action-Buttons
+            const cleanContent = printContent.replace(
+                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
+                ''
+            );
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Autorisierung ZfP - Schaeffler</title>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 15px; 
+                            color: #000;
+                            font-size: 10pt;
+                            line-height: 1.3;
+                        }
+                        @page { 
+                            size: A4 portrait; 
+                            margin: 15mm; 
+                        }
+                        .authorization-header {
+                            text-align: center;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 12px;
+                            margin-bottom: 20px;
+                        }
+                        .authorization-header h1 {
+                            font-size: 18pt;
+                            margin: 0 0 8px 0;
+                            color: #000;
+                        }
+                        .authorization-info {
+                            margin: 15px 0;
+                            padding: 12px;
+                            border: 1px solid #ccc;
+                            background: #f9f9f9;
+                        }
+                        .authorization-info p {
+                            margin: 6px 0;
+                            font-size: 10pt;
+                        }
+                        .authorization-text-box {
+                            border: 2px solid #000;
+                            padding: 15px;
+                            margin: 20px 0;
+                            font-size: 10pt;
+                            line-height: 1.4;
+                            background: #f9f9f9;
+                            min-height: 100px;
+                        }
+                        .authorization-details {
+                            margin: 20px 0;
+                            padding: 12px;
+                            border: 1px solid #ccc;
+                            background: #fff;
+                        }
+                        .authorization-details p {
+                            margin: 6px 0;
+                            font-size: 9pt;
+                        }
+                        .authorization-signatures {
+                            margin-top: 40px;
+                            padding-top: 20px;
+                            border-top: 2px solid #000;
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 30px;
+                        }
+                        .authorization-signature-field {
+                            flex: 1;
+                            text-align: center;
+                        }
+                        .authorization-signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 50px;
+                            padding-top: 8px;
+                            min-height: 40px;
+                        }
+                        .authorization-stamp-box {
+                            text-align: center;
+                            margin: 30px auto;
+                            padding: 12px;
+                            border: 2px solid #000;
+                            border-radius: 8px;
+                            background: #fff;
+                            width: 70%;
+                            max-width: 250px;
+                        }
+                        .authorization-stamp-box div:first-child {
+                            font-size: 12pt;
+                            font-weight: bold;
+                            margin-bottom: 4px;
+                        }
+                        @media print {
+                            body { padding: 0; }
+                            .authorization-signatures { 
+                                page-break-inside: avoid;
+                                margin-top: 50px;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Kurz warten, dann drucken
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 250);
+        }
 
         // === MODAL FUNKTIONEN ===
         function showCustomModal(message) {
@@ -3249,7 +3531,6 @@
             const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
             const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
             const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
-            const passed = answered === total && notOk === 0 && activityProofOk;
             
             let reportHTML = `
                 <div class="report-header">
@@ -3341,21 +3622,22 @@
             
             reportHTML += `
                 </div>
-
                 
                 <!-- UNTERSCHRIFTEN -->
-                <div class="signature-area clearfix">
+                <div class="signature-area">
                     <div class="signature-box">
-                        <div style="font-weight: bold; margin-bottom: 10px;">Auditor</div>
+                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">Auditor</div>
                         <div class="signature-line">
-                            ${headerData.auditorName || ''}<br>
+                            <div style="min-height: 20px;">${headerData.auditorName || ''}</div>
+                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
                     <div class="signature-box">
-                        <div style="font-weight: bold; margin-bottom: 10px;">NDT Expert</div>
+                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">NDT Expert (Level III)</div>
                         <div class="signature-line">
-                            ${headerData.approverName || ''}<br>
+                            <div style="min-height: 20px;">${headerData.approverName || ''}</div>
+                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
@@ -3369,7 +3651,7 @@
             
             document.getElementById('reportContainer').innerHTML = `
                 <div class="report-action-buttons">
-                    <button class="report-action-btn print-btn" onclick="window.print()">🖨️</button>
+                    <button class="report-action-btn print-btn" onclick="printFullReport()">🖨️</button>
                     <button class="report-action-btn close-btn" onclick="closeReport()">✕</button>
                 </div>
                 ${reportHTML}
@@ -3442,33 +3724,29 @@
                     <p><strong>Audit-Nummer:</strong> ${headerData.reportNumber || '---'}</p>
                 </div>
                 
-                <!-- DIGITALE UNTERSCHRIFTEN -->
-                <div class="signature-fields">
+                <!-- UNTERSCHRIFTEN - WIE IM BERICHTSFORMULAR -->
+                <div class="authorization-signatures">
                     <div class="authorization-signature-field">
-                        <div style="font-weight: bold; margin-bottom: 5px;">Digital signiert vom Autorisierter Mitarbeiter (oder Führungskraft):</div>
-                        <div style="min-height: 30px; border-bottom: 1px solid #000; padding-bottom: 5px;">
-                            <em>Digital signature placeholder for PDF</em>
-                        </div>
-                        <div style="margin-top: 5px; font-size: 12px; color: #666;">
-                            Datum: __________________
+                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">Autorisierter Mitarbeiter (oder Führungskraft)</div>
+                        <div class="authorization-signature-line">
+                            <div style="min-height: 20px;"></div>
+                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
                     <div class="authorization-signature-field">
-                        <div style="font-weight: bold; margin-bottom: 5px;">Digital signiert vom NDT Supervisor:</div>
-                        <div style="min-height: 30px; border-bottom: 1px solid #000; padding-bottom: 5px;">
-                            <em>Digital signature placeholder for PDF</em>
-                        </div>
-                        <div style="margin-top: 5px; font-size: 12px; color: #666;">
-                            Datum: __________________
+                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">NDT Supervisor (Level III)</div>
+                        <div class="authorization-signature-line">
+                            <div style="min-height: 20px;">${headerData.approverName || ''}</div>
+                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- STAMP -->
                 <div class="authorization-stamp-box">
-                    <div style="font-size: 18px; margin-bottom: 5px;">AUTORISIERUNG ERTEILT</div>
-                    <div style="font-size: 16px;">${now.toLocaleDateString('de-DE')}</div>
+                    <div>AUTORISIERUNG ERTEILT</div>
+                    <div>${now.toLocaleDateString('de-DE')}</div>
                 </div>
                 
                 <!-- FOOTER -->
@@ -3481,7 +3759,7 @@
             
             document.getElementById('authorizationContainer').innerHTML = `
                 <div class="report-action-buttons">
-                    <button class="report-action-btn print-btn" onclick="window.print()">🖨️</button>
+                    <button class="report-action-btn print-btn" onclick="printFullAuthorization()">🖨️</button>
                     <button class="report-action-btn close-btn" onclick="closeAuthorization()">✕</button>
                 </div>
                 ${authorizationHTML}
