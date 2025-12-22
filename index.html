@@ -933,7 +933,6 @@
         }
         
         .signature-line {
-            border-top: 1px solid #000;
             margin-top: 50px;
             padding-top: 8px;
             min-height: 40px;
@@ -2093,7 +2092,6 @@
                             text-align: center;
                         }
                         .signature-line {
-                            border-top: 1px solid #000;
                             margin-top: 30px;
                             padding-top: 6px;
                             min-height: 30px;
@@ -2220,7 +2218,7 @@
                             font-size: 8pt !important;
                         }
                         .authorization-signatures {
-                            margin-top: 30px;
+                            margin-top: 60px;
                             padding-top: 15px;
                             border-top: 1px solid #000;
                             display: flex;
@@ -2232,7 +2230,6 @@
                             text-align: center;
                         }
                         .authorization-signature-line {
-                            border-top: 1px solid #000;
                             margin-top: 40px;
                             padding-top: 6px;
                             min-height: 30px;
@@ -2251,7 +2248,7 @@
                         .authorization-stamp-box div:first-child {
                             font-size: 10pt !important;
                             font-weight: bold;
-                            margin-bottom: 3px;
+                            margin-bottom: 10px;
                         }
                         @media print {
                             body { 
@@ -3767,10 +3764,9 @@
                 <!-- UNTERSCHRIFTEN -->
                 <div class="signature-area">
                     <div class="signature-box">
-                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">Auditor</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">Auditor (Level II)</div>
                         <div class="signature-line">
                             <div style="min-height: 15px;">${headerData.auditorName || ''}</div>
-                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
@@ -3778,7 +3774,6 @@
                         <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">NDT Expert (Level III)</div>
                         <div class="signature-line">
                             <div style="min-height: 15px;">${headerData.approverName || ''}</div>
-                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
@@ -3870,15 +3865,13 @@
                         <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">Autorisierter Mitarbeiter (oder Führungskraft)</div>
                         <div class="authorization-signature-line">
                             <div style="min-height: 15px;"></div>
-                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
                     <div class="authorization-signature-field">
-                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">NDT Supervisor (Level III)</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">NDT Supervisor</div>
                         <div class="authorization-signature-line">
                             <div style="min-height: 15px;">${headerData.approverName || ''}</div>
-                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
