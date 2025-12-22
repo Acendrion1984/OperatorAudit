@@ -729,6 +729,61 @@
             background: #e74c3c;
         }
         
+        /* Wird beim Druck ausgeblendet */
+        @media print {
+            .report-action-buttons {
+                display: none !important;
+            }
+            body * {
+                visibility: hidden;
+            }
+            .report-overlay,
+            .report-overlay *,
+            .report-container,
+            .report-container * {
+                visibility: visible !important;
+            }
+            .report-overlay {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 100% !important;
+                overflow: visible !important;
+            }
+            .report-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 10mm !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+                page-break-inside: avoid !important;
+                page-break-after: auto !important;
+            }
+            
+            /* Bessere Seitenumbrüche für Berichtsteile */
+            .results-section {
+                page-break-inside: avoid !important;
+            }
+            
+            .signature-area {
+                page-break-before: always !important;
+                margin-top: 20mm !important;
+            }
+            
+            /* Optimiert für A4-Hochformat */
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+        }
+        
         .report-header {
             border-bottom: 2px solid #000;
             padding-bottom: 5px;
@@ -835,6 +890,32 @@
             font-size: 9px;
         }
         
+        /* GESAMTERGEBNIS IN DER MITTE */
+        .final-result-box {
+            border: 2px solid #000;
+            padding: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .final-result-box.passed {
+            background: #e0ffe0 !important;
+            border-color: #00a000;
+        }
+        
+        .final-result-box.failed {
+            background: #ffe0e0 !important;
+            border-color: #ff0000;
+        }
+        
+        .final-result-box.warning {
+            background: #fff8e0 !important;
+            border-color: #ffaa00;
+        }
+        
         /* Unterschriften - PROFESSIONELL WIE IM ORIGINAL */
         .signature-area {
             margin-top: 30px;
@@ -920,13 +1001,6 @@
             flex: 1;
             text-align: center;
             min-width: 45%;
-        }
-        
-        .authorization-signature-line {
-            border-top: 1px solid #000;
-            margin-top: 50px;
-            padding-top: 8px;
-            min-height: 40px;
         }
         
         .authorization-stamp-box {
@@ -1286,6 +1360,18 @@
             
             .question-id {
                 color: #000 !important;
+            }
+            
+            .final-result-box.passed {
+                background: #e0ffe0 !important;
+            }
+            
+            .final-result-box.failed {
+                background: #ffe0e0 !important;
+            }
+            
+            .final-result-box.warning {
+                background: #fff8e0 !important;
             }
             
             .authorization-header h1 {
@@ -1879,7 +1965,344 @@
     <input type="file" id="questionsLoader" accept=".json" style="display: none;">
 
     <script>
-        // === KONSTANTEN ===
+        // === PROFESSIONELLE DRUCKFUNKTIONEN ===
+        function printFullReport() {
+            const reportContainer = document.getElementById('reportContainer');
+            const printContent = reportContainer.innerHTML;
+            
+            // Entferne die Action-Buttons und die große "Audit bestanden" Box
+            let cleanContent = printContent.replace(
+                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
+                ''
+            );
+            
+            // Entferne die große "AUDIT BESTANDEN" Box komplett
+            cleanContent = cleanContent.replace(
+                /<!-- GESAMTERGEBNIS -->[\s\S]*?<!-- UNTERSCHRIFTEN -->/,
+                '<!-- UNTERSCHRIFTEN -->'
+            );
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>ZfP Audit Bericht - Schaeffler</title>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=0.84, maximum-scale=0.84">
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 10px; 
+                            color: #000;
+                            font-size: 9pt !important;
+                            line-height: 1.2;
+                            transform: scale(0.84);
+                            transform-origin: top left;
+                            width: 118%;
+                        }
+                        @page { 
+                            size: A4 portrait; 
+                            margin: 12mm; 
+                        }
+                        .report-header {
+                            border-bottom: 1px solid #000;
+                            padding-bottom: 6px;
+                            margin-bottom: 10px;
+                            text-align: center;
+                        }
+                        .report-header h2 {
+                            font-size: 12pt !important;
+                            margin: 0 0 3px 0;
+                            color: #000;
+                        }
+                        .company-info {
+                            font-size: 8pt !important;
+                            margin: 1px 0;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 6px 0;
+                            font-size: 7pt !important;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 4px !important;
+                            vertical-align: top;
+                        }
+                        th {
+                            background: #f0f0f0;
+                            font-weight: bold;
+                        }
+                        .details-table td:first-child {
+                            font-weight: bold;
+                            width: 25%;
+                            background: #f9f9f9;
+                        }
+                        .results-section {
+                            margin: 12px 0;
+                        }
+                        .report-section-header {
+                            font-size: 9pt !important;
+                            font-weight: bold;
+                            margin: 10px 0 4px 0;
+                            padding-bottom: 2px;
+                            border-bottom: 1px solid #000;
+                        }
+                        .question-item {
+                            margin: 2px 0;
+                            padding: 3px;
+                            font-size: 8pt !important;
+                            line-height: 1.1;
+                        }
+                        .question-item.ok {
+                            border-left: 1px solid #00a000;
+                            background: #f0fff0;
+                        }
+                        .question-item.not-ok {
+                            border-left: 1px solid #ff0000;
+                            background: #fff0f0;
+                        }
+                        .question-id {
+                            font-weight: bold;
+                            font-size: 8pt !important;
+                        }
+                        .question-comment {
+                            font-style: italic;
+                            color: #666;
+                            margin-left: 6px;
+                            font-size: 7pt !important;
+                        }
+                        .signature-area {
+                            margin-top: 25px;
+                            padding-top: 12px;
+                            border-top: 1px solid #000;
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 15px;
+                        }
+                        .signature-box {
+                            flex: 1;
+                            text-align: center;
+                        }
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 30px;
+                            padding-top: 6px;
+                            min-height: 30px;
+                            font-size: 9pt !important;
+                        }
+                        .final-result-box {
+                            display: none !important;
+                        }
+                        @media print {
+                            body { 
+                                padding: 0 !important; 
+                                transform: scale(1) !important;
+                                width: 100% !important;
+                            }
+                            .signature-area { 
+                                page-break-inside: avoid;
+                                margin-top: 30px;
+                            }
+                            table { font-size: 7pt !important; }
+                            .question-item { font-size: 7pt !important; }
+                            .report-header h2 { font-size: 11pt !important; }
+                        }
+                        @media screen and (max-width: 768px) {
+                            body {
+                                transform: scale(0.84) !important;
+                                width: 118% !important;
+                                padding: 8px !important;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Kurz warten, dann drucken
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 300);
+        }
+
+        function printFullAuthorization() {
+            const authorizationContainer = document.getElementById('authorizationContainer');
+            const printContent = authorizationContainer.innerHTML;
+            
+            // Entferne die Action-Buttons
+            const cleanContent = printContent.replace(
+                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
+                ''
+            );
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Autorisierung ZfP - Schaeffler</title>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=0.84, maximum-scale=0.84">
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 10px; 
+                            color: #000;
+                            font-size: 9pt !important;
+                            line-height: 1.2;
+                            transform: scale(0.84);
+                            transform-origin: top left;
+                            width: 118%;
+                        }
+                        @page { 
+                            size: A4 portrait; 
+                            margin: 12mm; 
+                        }
+                        .authorization-header {
+                            text-align: center;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 10px;
+                            margin-bottom: 15px;
+                        }
+                        .authorization-header h1 {
+                            font-size: 16pt !important;
+                            margin: 0 0 6px 0;
+                            color: #000;
+                        }
+                        .authorization-info {
+                            margin: 12px 0;
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            background: #f9f9f9;
+                        }
+                        .authorization-info p {
+                            margin: 4px 0;
+                            font-size: 9pt !important;
+                        }
+                        .authorization-text-box {
+                            border: 1px solid #000;
+                            padding: 12px;
+                            margin: 15px 0;
+                            font-size: 9pt !important;
+                            line-height: 1.3;
+                            background: #f9f9f9;
+                            min-height: 80px;
+                        }
+                        .authorization-details {
+                            margin: 15px 0;
+                            padding: 10px;
+                            border: 1px solid #ccc;
+                            background: #fff;
+                        }
+                        .authorization-details p {
+                            margin: 4px 0;
+                            font-size: 8pt !important;
+                        }
+                        .authorization-signatures {
+                            margin-top: 30px;
+                            padding-top: 15px;
+                            border-top: 1px solid #000;
+                            display: flex;
+                            justify-content: space-between;
+                            gap: 20px;
+                        }
+                        .authorization-signature-field {
+                            flex: 1;
+                            text-align: center;
+                        }
+                        .authorization-signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 40px;
+                            padding-top: 6px;
+                            min-height: 30px;
+                            font-size: 9pt !important;
+                        }
+                        .authorization-stamp-box {
+                            text-align: center;
+                            margin: 25px auto;
+                            padding: 10px;
+                            border: 2px solid #000;
+                            border-radius: 6px;
+                            background: #fff;
+                            width: 60%;
+                            max-width: 200px;
+                        }
+                        .authorization-stamp-box div:first-child {
+                            font-size: 10pt !important;
+                            font-weight: bold;
+                            margin-bottom: 3px;
+                        }
+                        @media print {
+                            body { 
+                                padding: 0 !important; 
+                                transform: scale(1) !important;
+                                width: 100% !important;
+                            }
+                            .authorization-signatures { 
+                                page-break-inside: avoid;
+                                margin-top: 35px;
+                            }
+                        }
+                        @media screen and (max-width: 768px) {
+                            body {
+                                transform: scale(0.84) !important;
+                                width: 118% !important;
+                                padding: 8px !important;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanContent}
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Kurz warten, dann drucken
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 300);
+        }
+
+        // === MODAL FUNKTIONEN ===
+        function showCustomModal(message) {
+            return new Promise((resolve) => {
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('customModal').style.display = 'flex';
+                customModalResolve = resolve;
+            });
+        }
+
+        function closeCustomModal() {
+            document.getElementById('customModal').style.display = 'none';
+            customModalResolve = null;
+        }
+
+        // === GLOBALE VARIABLEN ===
         const AUDIT_TYPES = {
             wirbelstrom: { 
                 id: 'wirbelstrom', 
@@ -2324,291 +2747,6 @@
         let imageStorage = {};
         let uploadedImages = new Set();
         let customModalResolve = null;
-
-        function printFullReport() {
-            const reportContainer = document.getElementById('reportContainer');
-            const printContent = reportContainer.innerHTML;
-            
-            // Entferne nur die Action-Buttons (keine Audit-Box mehr zu entfernen)
-            const cleanContent = printContent.replace(
-                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
-                ''
-            );
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>ZfP Audit Bericht - Schaeffler</title>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            margin: 0; 
-                            padding: 15px; 
-                            color: #000;
-                            font-size: 10pt;
-                            line-height: 1.3;
-                        }
-                        @page { 
-                            size: A4 portrait; 
-                            margin: 15mm; 
-                        }
-                        .report-header {
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 8px;
-                            margin-bottom: 12px;
-                            text-align: center;
-                        }
-                        .report-header h2 {
-                            font-size: 14pt;
-                            margin: 0 0 4px 0;
-                            color: #000;
-                        }
-                        .company-info {
-                            font-size: 9pt;
-                            margin: 2px 0;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin: 8px 0;
-                            font-size: 9pt;
-                        }
-                        th, td {
-                            border: 1px solid #000;
-                            padding: 5px;
-                            vertical-align: top;
-                        }
-                        th {
-                            background: #f0f0f0;
-                            font-weight: bold;
-                        }
-                        .details-table td:first-child {
-                            font-weight: bold;
-                            width: 25%;
-                            background: #f9f9f9;
-                        }
-                        .results-section {
-                            margin: 15px 0;
-                        }
-                        .report-section-header {
-                            font-size: 10pt;
-                            font-weight: bold;
-                            margin: 12px 0 6px 0;
-                            padding-bottom: 2px;
-                            border-bottom: 1px solid #000;
-                        }
-                        .question-item {
-                            margin: 3px 0;
-                            padding: 4px;
-                            font-size: 9pt;
-                            line-height: 1.2;
-                        }
-                        .question-item.ok {
-                            border-left: 2px solid #00a000;
-                            background: #f0fff0;
-                        }
-                        .question-item.not-ok {
-                            border-left: 2px solid #ff0000;
-                            background: #fff0f0;
-                        }
-                        .question-id {
-                            font-weight: bold;
-                        }
-                        .question-comment {
-                            font-style: italic;
-                            color: #666;
-                            margin-left: 8px;
-                            font-size: 8pt;
-                        }
-                        .signature-area {
-                            margin-top: 30px;
-                            padding-top: 15px;
-                            border-top: 1px solid #000;
-                            display: flex;
-                            justify-content: space-between;
-                            gap: 20px;
-                        }
-                        .signature-box {
-                            flex: 1;
-                            text-align: center;
-                        }
-                        .signature-line {
-                            border-top: 1px solid #000;
-                            margin-top: 40px;
-                            padding-top: 8px;
-                            min-height: 40px;
-                        }
-                        @media print {
-                            body { padding: 0; }
-                            .signature-area { 
-                                page-break-inside: avoid;
-                                margin-top: 40px;
-                            }
-                            table { font-size: 8pt; }
-                            .question-item { font-size: 8pt; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${cleanContent}
-                </body>
-                </html>
-            `);
-            
-            printWindow.document.close();
-            
-            // Kurz warten, dann drucken
-            setTimeout(() => {
-                printWindow.focus();
-                printWindow.print();
-            }, 250);
-        }
-
-        function printFullAuthorization() {
-            const authorizationContainer = document.getElementById('authorizationContainer');
-            const printContent = authorizationContainer.innerHTML;
-            
-            // Entferne die Action-Buttons
-            const cleanContent = printContent.replace(
-                /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
-                ''
-            );
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Autorisierung ZfP - Schaeffler</title>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <style>
-                        body { 
-                            font-family: Arial, sans-serif; 
-                            margin: 0; 
-                            padding: 15px; 
-                            color: #000;
-                            font-size: 10pt;
-                            line-height: 1.3;
-                        }
-                        @page { 
-                            size: A4 portrait; 
-                            margin: 15mm; 
-                        }
-                        .authorization-header {
-                            text-align: center;
-                            border-bottom: 2px solid #000;
-                            padding-bottom: 12px;
-                            margin-bottom: 20px;
-                        }
-                        .authorization-header h1 {
-                            font-size: 18pt;
-                            margin: 0 0 8px 0;
-                            color: #000;
-                        }
-                        .authorization-info {
-                            margin: 15px 0;
-                            padding: 12px;
-                            border: 1px solid #ccc;
-                            background: #f9f9f9;
-                        }
-                        .authorization-info p {
-                            margin: 6px 0;
-                            font-size: 10pt;
-                        }
-                        .authorization-text-box {
-                            border: 2px solid #000;
-                            padding: 15px;
-                            margin: 20px 0;
-                            font-size: 10pt;
-                            line-height: 1.4;
-                            background: #f9f9f9;
-                            min-height: 100px;
-                        }
-                        .authorization-details {
-                            margin: 20px 0;
-                            padding: 12px;
-                            border: 1px solid #ccc;
-                            background: #fff;
-                        }
-                        .authorization-details p {
-                            margin: 6px 0;
-                            font-size: 9pt;
-                        }
-                        .authorization-signatures {
-                            margin-top: 40px;
-                            padding-top: 20px;
-                            border-top: 2px solid #000;
-                            display: flex;
-                            justify-content: space-between;
-                            gap: 30px;
-                        }
-                        .authorization-signature-field {
-                            flex: 1;
-                            text-align: center;
-                        }
-                        .authorization-signature-line {
-                            border-top: 1px solid #000;
-                            margin-top: 50px;
-                            padding-top: 8px;
-                            min-height: 40px;
-                        }
-                        .authorization-stamp-box {
-                            text-align: center;
-                            margin: 30px auto;
-                            padding: 12px;
-                            border: 2px solid #000;
-                            border-radius: 8px;
-                            background: #fff;
-                            width: 70%;
-                            max-width: 250px;
-                        }
-                        .authorization-stamp-box div:first-child {
-                            font-size: 12pt;
-                            font-weight: bold;
-                            margin-bottom: 4px;
-                        }
-                        @media print {
-                            body { padding: 0; }
-                            .authorization-signatures { 
-                                page-break-inside: avoid;
-                                margin-top: 50px;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${cleanContent}
-                </body>
-                </html>
-            `);
-            
-            printWindow.document.close();
-            
-            // Kurz warten, dann drucken
-            setTimeout(() => {
-                printWindow.focus();
-                printWindow.print();
-            }, 250);
-        }
-
-        // === MODAL FUNKTIONEN ===
-        function showCustomModal(message) {
-            return new Promise((resolve) => {
-                document.getElementById('modalMessage').textContent = message;
-                document.getElementById('customModal').style.display = 'flex';
-                customModalResolve = resolve;
-            });
-        }
-
-        function closeCustomModal() {
-            document.getElementById('customModal').style.display = 'none';
-            customModalResolve = null;
-        }
 
         // === INITIALISIERUNG ===
         document.addEventListener('DOMContentLoaded', function() {
@@ -3531,6 +3669,7 @@
             const notOk = allQuestions.filter(q => q.verdict === 'not-ok').length;
             const activityProofQuestion = allQuestions.find(q => q.isActivityProof);
             const activityProofOk = activityProofQuestion && activityProofQuestion.verdict === 'ok';
+            const passed = answered === total && notOk === 0 && activityProofOk;
             
             let reportHTML = `
                 <div class="report-header">
@@ -3622,28 +3761,30 @@
             
             reportHTML += `
                 </div>
+
+                <!-- KEINE GESAMTERGEBNIS-BOX MEHR (wurde entfernt) -->
                 
                 <!-- UNTERSCHRIFTEN -->
                 <div class="signature-area">
                     <div class="signature-box">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">Auditor</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">Auditor</div>
                         <div class="signature-line">
-                            <div style="min-height: 20px;">${headerData.auditorName || ''}</div>
-                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
+                            <div style="min-height: 15px;">${headerData.auditorName || ''}</div>
+                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
                     <div class="signature-box">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">NDT Expert (Level III)</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">NDT Expert (Level III)</div>
                         <div class="signature-line">
-                            <div style="min-height: 20px;">${headerData.approverName || ''}</div>
-                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
+                            <div style="min-height: 15px;">${headerData.approverName || ''}</div>
+                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- FOOTER -->
-                <div style="margin-top: 20px; font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 8px;">
+                <div style="margin-top: 15px; font-size: 8pt; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 6px;">
                     <div>Erstellt: ${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}</div>
                     <div>Nächste Prüfung fällig: ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</div>
                 </div>
@@ -3719,7 +3860,6 @@
                 
                 <div class="authorization-details">
                     <p><strong>Befugnisse:</strong> Autorisierung zur ${auditInfo.title} an ${auditInfo.short} Anlagen in ${werk || 'dem zuständigen Werk'}</p>
-                    <p><strong>Gültigkeitsdauer:</strong> ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</p>
                     <p><strong>Audit-Datum:</strong> ${now.toLocaleDateString('de-DE')}</p>
                     <p><strong>Audit-Nummer:</strong> ${headerData.reportNumber || '---'}</p>
                 </div>
@@ -3727,18 +3867,18 @@
                 <!-- UNTERSCHRIFTEN - WIE IM BERICHTSFORMULAR -->
                 <div class="authorization-signatures">
                     <div class="authorization-signature-field">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">Autorisierter Mitarbeiter (oder Führungskraft)</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">Autorisierter Mitarbeiter (oder Führungskraft)</div>
                         <div class="authorization-signature-line">
-                            <div style="min-height: 20px;"></div>
-                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
+                            <div style="min-height: 15px;"></div>
+                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                     
                     <div class="authorization-signature-field">
-                        <div style="font-weight: bold; margin-bottom: 10px; font-size: 11px;">NDT Supervisor (Level III)</div>
+                        <div style="font-weight: bold; margin-bottom: 8px; font-size: 9pt;">NDT Supervisor (Level III)</div>
                         <div class="authorization-signature-line">
-                            <div style="min-height: 20px;">${headerData.approverName || ''}</div>
-                            <div style="font-size: 10px; color: #666;">Datum: __________________</div>
+                            <div style="min-height: 15px;">${headerData.approverName || ''}</div>
+                            <div style="font-size: 8pt; color: #666;">Datum: __________________</div>
                         </div>
                     </div>
                 </div>
@@ -3750,7 +3890,7 @@
                 </div>
                 
                 <!-- FOOTER -->
-                <div style="margin-top: 30px; font-size: 11px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 10px;">
+                <div style="margin-top: 20px; font-size: 8pt; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 8px;">
                     <div>Diese Autorisierung basiert auf dem erfolgreichen Audit vom ${now.toLocaleDateString('de-DE')}</div>
                     <div>Referenz: Prüfbericht-Nr. ${headerData.reportNumber || '---'}</div>
                     <div>Gültig bis: ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</div>
