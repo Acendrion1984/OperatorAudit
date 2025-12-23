@@ -2380,7 +2380,7 @@
                 ''
             );
             
-            // Prüfe ob mobile Version
+            // Prüfe ob mobile Version - ABER FÜR DRUCK KEINE TRANSFORMATION
             const isMobile = window.innerWidth <= 768;
             
             const printWindow = window.open('', '_blank');
@@ -2392,19 +2392,13 @@
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        html, body {
-                            height: 100%;
-                            margin: 0;
-                            padding: 0;
-                        }
                         body { 
                             font-family: Arial, sans-serif; 
+                            margin: 0; 
                             padding: 15px; 
                             color: #000;
                             font-size: 10pt;
                             line-height: 1.3;
-                            ${isMobile ? 'transform: scale(0.93); transform-origin: top left;' : ''}
-                            /* WICHTIG: Keine width-Anpassung, nur transform */
                         }
                         @page { 
                             size: A4 portrait; 
@@ -2495,31 +2489,57 @@
                             /* KEINE BORDER - NUR ABSTAND */
                             margin-top: 50px;
                             min-height: 40px;
+                            height: 60px;
                         }
-                        /* FOOTER */
+                        /* BILDER IM BERICHT */
+                        .report-image-container {
+                            margin: 10px 0;
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            background: #f9f9f9;
+                            page-break-inside: avoid;
+                        }
+                        .report-image-grid {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                            margin-top: 8px;
+                        }
+                        .report-image-item {
+                            border: 1px solid #ccc;
+                            padding: 5px;
+                            background: white;
+                            text-align: center;
+                        }
+                        .report-image {
+                            max-width: 80px;
+                            max-height: 80px;
+                            object-fit: contain;
+                            border: 1px solid #eee;
+                        }
+                        .report-image-caption {
+                            font-size: 8px;
+                            color: #666;
+                            margin-top: 3px;
+                        }
+                        /* FOOTER TABLES OHNE RAHMEN UND WENIGER ABSTAND */
                         body > div:last-child {
-                            margin-top: 15px;
-                            padding-top: 8px;
-                            border-top: 1px solid #ccc;
-                            font-size: 9pt;
+                            margin-top: 5px !important;
+                            padding-top: 3px !important;
+                            border-top: 1px solid #ccc !important;
                         }
-                        body > div:last-child table {
-                            width: 100%;
-                            border: none;
+                        body > div:last-child table,
+                        body > div:last-child table td {
+                            border: none !important;
+                            border-collapse: collapse !important;
                         }
                         body > div:last-child table td {
-                            border: none;
-                            padding: 0;
-                            vertical-align: top;
+                            padding: 0 !important;
                         }
                         @media print {
-                            html, body {
-                                height: auto;
-                            }
                             body { 
                                 padding: 0; 
-                                ${isMobile ? 'transform: scale(0.93) !important; transform-origin: top left !important;' : ''}
-                                /* KEINE width-Anpassung im Druck! */
+                                /* KEINE TRANSFORMATION FÜR DRUCK - DAS VERURSACHT DEN ABSTAND */
                             }
                             .signature-area { 
                                 page-break-inside: avoid;
@@ -2531,14 +2551,27 @@
                                 border: none !important;
                                 margin-top: 40px;
                                 min-height: 40px;
+                                height: 60px;
                             }
                             table { font-size: 8pt; }
                             .question-item { font-size: 8pt; }
-                            /* FOOTER IM DRUCK */
+                            /* BILDER FÜR DRUCK OPTIMIEREN */
+                            .report-image {
+                                max-width: 70px;
+                                max-height: 70px;
+                            }
+                            .report-image-container {
+                                border: 0.5px solid #aaa;
+                            }
+                            /* FOOTER OHNE RAHMEN UND WENIGER ABSTAND */
+                            body > div:last-child table,
+                            body > div:last-child table td {
+                                border: none !important;
+                            }
                             body > div:last-child {
-                                margin-top: 10px;
-                                padding-top: 5px;
-                                font-size: 8pt;
+                                margin-top: 2px !important;
+                                padding-top: 2px !important;
+                                page-break-inside: avoid;
                             }
                         }
                     </style>
@@ -2580,18 +2613,14 @@
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        html, body {
-                            height: 100%;
-                            margin: 0;
-                            padding: 0;
-                        }
                         body { 
                             font-family: Arial, sans-serif; 
+                            margin: 0; 
                             padding: 15px; 
                             color: #000;
                             font-size: 10pt;
                             line-height: 1.3;
-                            ${isMobile ? 'transform: scale(0.93); transform-origin: top left;' : ''}
+                            ${isMobile ? 'transform: scale(0.95); transform-origin: top left; width: 105.3%;' : ''}
                         }
                         @page { 
                             size: A4 portrait; 
@@ -2653,6 +2682,7 @@
                             margin-top: 40px;
                             padding-top: 8px;
                             min-height: 40px;
+                            height: 60px;
                         }
                         .authorization-stamp-box {
                             text-align: center;
@@ -2669,38 +2699,29 @@
                             font-weight: bold;
                             margin-bottom: 20px;
                         }
-                        /* FOOTER */
-                        body > div:last-child {
-                            margin-top: 30px;
-                            padding-top: 10px;
-                            border-top: 1px solid #ccc;
-                            font-size: 9pt;
-                        }
-                        body > div:last-child table {
-                            width: 100%;
-                            border: none;
+                        /* FOOTER TABLES OHNE RAHMEN */
+                        body > div:last-child table,
+                        body > div:last-child table td,
+                        body > div:last-child table tr {
+                            border: none !important;
+                            border-collapse: collapse !important;
                         }
                         body > div:last-child table td {
-                            border: none;
-                            padding: 0;
+                            padding: 0 !important;
                         }
                         @media print {
-                            html, body {
-                                height: auto;
-                            }
                             body { 
                                 padding: 0; 
-                                ${isMobile ? 'transform: scale(0.93) !important; transform-origin: top left !important;' : ''}
+                                ${isMobile ? 'transform: scale(0.95) !important; transform-origin: top left !important; width: 105.3% !important;' : ''}
                             }
                             .authorization-signatures { 
                                 page-break-inside: avoid;
                                 margin-top: 50px;
                             }
-                            /* FOOTER IM DRUCK */
-                            body > div:last-child {
-                                margin-top: 20px;
-                                padding-top: 8px;
-                                font-size: 8pt;
+                            /* FOOTER OHNE RAHMEN */
+                            body > div:last-child table,
+                            body > div:last-child table td {
+                                border: none !important;
                             }
                         }
                     </style>
@@ -2719,7 +2740,6 @@
                 printWindow.print();
             }, 250);
         }
-            
 
         // === MODAL FUNKTIONEN ===
         function showCustomModal(message) {
@@ -4271,4 +4291,3 @@ eine Gültigkeit von 12 Monaten.</strong><br><br><em>The named person has demons
     </script>
 </body>
 </html>
-
