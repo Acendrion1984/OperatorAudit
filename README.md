@@ -1,2 +1,0 @@
-# OperatorAudit
-Operator Audit
