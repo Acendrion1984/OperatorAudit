@@ -2380,8 +2380,8 @@
                 ''
             );
             
-            // Prüfe ob mobile Version - ABER FÜR DRUCK KEINE TRANSFORMATION
-            const isMobile = window.innerWidth <= 768;
+            // WICHTIG: Für Druck IMMER Desktop-Stil verwenden, egal ob mobile oder nicht
+            // KEINE mobile Transformation für Druck!
             
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
@@ -2399,6 +2399,7 @@
                             color: #000;
                             font-size: 10pt;
                             line-height: 1.3;
+                            /* KEINE MOBILE TRANSFORMATION - IMMER DESKTOP STIL */
                         }
                         @page { 
                             size: A4 portrait; 
@@ -2524,8 +2525,8 @@
                         }
                         /* FOOTER TABLES OHNE RAHMEN UND WENIGER ABSTAND */
                         body > div:last-child {
-                            margin-top: 5px !important;
-                            padding-top: 3px !important;
+                            margin-top: 10px !important;
+                            padding-top: 5px !important;
                             border-top: 1px solid #ccc !important;
                         }
                         body > div:last-child table,
@@ -2539,7 +2540,7 @@
                         @media print {
                             body { 
                                 padding: 0; 
-                                /* KEINE TRANSFORMATION FÜR DRUCK - DAS VERURSACHT DEN ABSTAND */
+                                /* WICHTIG: KEINE TRANSFORMATION FÜR DRUCK */
                             }
                             .signature-area { 
                                 page-break-inside: avoid;
@@ -2569,8 +2570,8 @@
                                 border: none !important;
                             }
                             body > div:last-child {
-                                margin-top: 2px !important;
-                                padding-top: 2px !important;
+                                margin-top: 5px !important;
+                                padding-top: 3px !important;
                                 page-break-inside: avoid;
                             }
                         }
@@ -2589,8 +2590,7 @@
                 printWindow.focus();
                 printWindow.print();
             }, 250);
-        }
-            
+        }            
         function printFullAuthorization() {
             const authorizationContainer = document.getElementById('authorizationContainer');
             const printContent = authorizationContainer.innerHTML;
