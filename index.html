@@ -2399,7 +2399,7 @@
                             color: #000;
                             font-size: 10pt;
                             line-height: 1.3;
-                            /* KEINE MOBILE TRANSFORMATION - IMMER DESKTOP STIL */
+                            ${isMobile ? 'transform: scale(0.89); transform-origin: top left; width: 112.36%;' : ''}
                         }
                         @page { 
                             size: A4 portrait; 
