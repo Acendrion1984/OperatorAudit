@@ -3680,7 +3680,15 @@
             
             const headerData = getHeaderData();
             const auditInfo = AUDIT_TYPES[currentAuditType];
-            const now = new Date();
+            
+            // Erstelle eine feste Datumsreferenz für das Audit-Datum
+            const auditDate = new Date();
+            const auditDateString = auditDate.toLocaleDateString('de-DE');
+            
+            // Berechne das Ablaufdatum (12 Monate später)
+            const expiryDate = new Date(auditDate);
+            expiryDate.setMonth(expiryDate.getMonth() + 12);
+            const expiryDateString = expiryDate.toLocaleDateString('de-DE');
             
             let werk = '';
             if (headerData.operatorDept) {
@@ -3712,8 +3720,8 @@
                 
                 <div class="authorization-details">
                     <p><strong>Befugnisse:</strong> Autorisierung zur ${auditInfo.title} an ${auditInfo.short} Anlagen in ${werk || 'dem zuständigen Werk'}</p>
-                    <p><strong>Gültigkeitsdauer:</strong> ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</p>
-                    <p><strong>Audit-Datum:</strong> ${now.toLocaleDateString('de-DE')}</p>
+                    <p><strong>Gültigkeitsdauer:</strong> ${expiryDateString}</p>
+                    <p><strong>Audit-Datum:</strong> ${auditDateString}</p>
                     <p><strong>Audit-Nummer:</strong> ${headerData.reportNumber || '---'}</p>
                 </div>
                 
@@ -3736,14 +3744,14 @@
                 <!-- STAMP -->
                 <div class="authorization-stamp-box">
                     <div>AUTORISIERUNG ERTEILT</div>
-                    <div>${now.toLocaleDateString('de-DE')}</div>
+                    <div>${auditDateString}</div>
                 </div>
                 
                 <!-- FOOTER -->
                 <div style="margin-top: 30px; font-size: 11px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 10px;">
-                    <div>Diese Autorisierung basiert auf dem erfolgreichen Audit vom ${now.toLocaleDateString('de-DE')}</div>
+                    <div>Diese Autorisierung basiert auf dem erfolgreichen Audit vom ${auditDateString}</div>
                     <div>Referenz: Prüfbericht-Nr. ${headerData.reportNumber || '---'}</div>
-                    <div>Gültig bis: ${new Date(now.setMonth(now.getMonth() + 12)).toLocaleDateString('de-DE')}</div>
+                    <div>Gültig bis: ${expiryDateString}</div>
                 </div>
             `;
             
@@ -3756,16 +3764,6 @@
             `;
             document.getElementById('authorizationOverlay').style.display = 'block';
             document.body.style.overflow = 'hidden';
-        }
-
-        function closeReport() {
-            document.getElementById('reportOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        function closeAuthorization() {
-            document.getElementById('authorizationOverlay').style.display = 'none';
-            document.body.style.overflow = 'auto';
         }
 
         // === RESET FUNKTION ===
