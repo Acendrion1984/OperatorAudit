@@ -854,7 +854,6 @@
         
         .signature-line {
             margin-top: 50px;
-            padding-top: 8px;
             min-height: 40px;
         }
         
@@ -1658,7 +1657,53 @@
             .progress-bar {
                 height: 8px;
             }
-        }
+            /* === BILDER IM BERICHT === */
+            .report-image-container {
+                margin: 10px 0;
+                padding: 8px;
+                border: 1px solid #ddd;
+                background: #f9f9f9;
+            }
+
+            .report-image-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 8px;
+            }
+
+            .report-image-item {
+                border: 1px solid #ccc;
+                padding: 5px;
+                background: white;
+                text-align: center;
+            }
+
+            .report-image {
+                max-width: 80px;
+                max-height: 80px;
+                object-fit: contain;
+                border: 1px solid #eee;
+            }
+
+
+            /* Beim Drucken */
+            @media print {
+                .report-image {
+                    max-width: 70px;
+                    max-height: 70px;
+                }
+            }
+
+            /* Für Dark Mode - Bilder bleiben immer sichtbar */
+            @media (prefers-color-scheme: dark) {
+                .report-container .report-image-container {
+                    background: #f9f9f9 !important;
+                }
+                .report-container .report-image-item {
+                    background: white !important;
+                }
+            }
     </style>
 </head>
 <body>
@@ -2329,7 +2374,7 @@
             const reportContainer = document.getElementById('reportContainer');
             const printContent = reportContainer.innerHTML;
             
-            // Entferne nur die Action-Buttons (keine Audit-Box mehr zu entfernen)
+            // Entferne nur die Action-Buttons
             const cleanContent = printContent.replace(
                 /<div class="report-action-buttons">[\s\S]*?<\/div>/, 
                 ''
@@ -2440,10 +2485,52 @@
                             flex: 1;
                             text-align: center;
                         }
+                        /* WICHTIG: KEINE LINIEN IN DEN UNTERSCHRIFTSFELDERN */
                         .signature-line {
-                            margin-top: 40px;
-                            padding-top: 8px;
+                            /* KEINE BORDER - NUR ABSTAND */
+                            margin-top: 50px;
                             min-height: 40px;
+                            height: 60px;
+                        }
+                        /* BILDER IM BERICHT */
+                        .report-image-container {
+                            margin: 10px 0;
+                            padding: 8px;
+                            border: 1px solid #ddd;
+                            background: #f9f9f9;
+                            page-break-inside: avoid;
+                        }
+                        .report-image-grid {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                            margin-top: 8px;
+                        }
+                        .report-image-item {
+                            border: 1px solid #ccc;
+                            padding: 5px;
+                            background: white;
+                            text-align: center;
+                        }
+                        .report-image {
+                            max-width: 80px;
+                            max-height: 80px;
+                            object-fit: contain;
+                            border: 1px solid #eee;
+                        }
+                        .report-image-caption {
+                            font-size: 8px;
+                            color: #666;
+                            margin-top: 3px;
+                        }
+                        /* FOOTER TABLES OHNE RAHMEN */
+                        body > div:last-child table,
+                        body > div:last-child table td {
+                            border: none !important;
+                            border-collapse: collapse !important;
+                        }
+                        body > div:last-child table td {
+                            padding: 0 !important;
                         }
                         @media print {
                             body { 
@@ -2454,8 +2541,29 @@
                                 page-break-inside: avoid;
                                 margin-top: 40px;
                             }
+                            /* WICHTIG: KEINE LINIEN IN DEN UNTERSCHRIFTSFELDERN IM DRUCK */
+                            .signature-line {
+                                border-top: none !important;
+                                border: none !important;
+                                margin-top: 40px;
+                                min-height: 40px;
+                                height: 60px;
+                            }
                             table { font-size: 8pt; }
                             .question-item { font-size: 8pt; }
+                            /* BILDER FÜR DRUCK OPTIMIEREN */
+                            .report-image {
+                                max-width: 70px;
+                                max-height: 70px;
+                            }
+                            .report-image-container {
+                                border: 0.5px solid #aaa;
+                            }
+                            /* FOOTER OHNE RAHMEN */
+                            body > div:last-child table,
+                            body > div:last-child table td {
+                                border: none !important;
+                            }
                         }
                     </style>
                 </head>
@@ -2473,7 +2581,7 @@
                 printWindow.print();
             }, 250);
         }
-
+            
         function printFullAuthorization() {
             const authorizationContainer = document.getElementById('authorizationContainer');
             const printContent = authorizationContainer.innerHTML;
@@ -2562,14 +2670,14 @@
                             text-align: center;
                         }
                         .authorization-signature-line {
-                            border-top: 1px solid #000;
-                            margin-top: 50px;
+                            margin-top: 40px;
                             padding-top: 8px;
                             min-height: 40px;
+                            height: 60px;
                         }
                         .authorization-stamp-box {
                             text-align: center;
-                            margin: 30px auto;
+                            margin: 1px auto;
                             padding: 12px;
                             border: 2px solid #000;
                             border-radius: 8px;
@@ -2580,7 +2688,17 @@
                         .authorization-stamp-box div:first-child {
                             font-size: 12pt;
                             font-weight: bold;
-                            margin-bottom: 4px;
+                            margin-bottom: 20px;
+                        }
+                        /* FOOTER TABLES OHNE RAHMEN */
+                        body > div:last-child table,
+                        body > div:last-child table td,
+                        body > div:last-child table tr {
+                            border: none !important;
+                            border-collapse: collapse !important;
+                        }
+                        body > div:last-child table td {
+                            padding: 0 !important;
                         }
                         @media print {
                             body { 
@@ -2590,6 +2708,11 @@
                             .authorization-signatures { 
                                 page-break-inside: avoid;
                                 margin-top: 50px;
+                            }
+                            /* FOOTER OHNE RAHMEN */
+                            body > div:last-child table,
+                            body > div:last-child table td {
+                                border: none !important;
                             }
                         }
                     </style>
@@ -3562,13 +3685,13 @@
             let reportHTML = `
                 <div class="report-header" style="position: relative;">
                     <!-- LOGO OBEN RECHTS -->
-                    <div style="position: absolute; top: 10px; right: 10px; text-align: right;">
+                    <div style="position: absolute; top: -5px; right: 1px; text-align: right;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Schaeffler_logo.svg" 
                              alt="Schaeffler Logo" 
                              style="height: 7mm; width: auto; max-width: 35mm;">
                     </div>
                     
-                    <h2>ZfP-Audit-Bericht / NDT-Operator Audit Report</h2>
+                    <h2>ZfP-Operator Audit</h2>
                     <div class="company-info"><strong>Prüfbericht-Nr.:</strong> ${headerData.reportNumber || 'Muster_2025_NE'}</div>
                 </div>
                 
@@ -3649,6 +3772,7 @@
                         <div class="question-item ${verdictClass}">
                             <span class="question-id">${question.id}:</span> ${verdictIcon} ${question.text}
                             ${question.comment ? `<div class="question-comment">Kommentar: ${question.comment}</div>` : ''}
+                            ${renderQuestionImagesInReport(question)}
                         </div>
                     `;
                 });
@@ -3657,23 +3781,25 @@
             reportHTML += `
                 </div>
                 
-                <!-- UNTERSCHRIFTEN -->
+                <!-- UNTERSCHRIFTEN OHNE LINIEN -->
                 <div class="signature-area">
                     <div class="signature-box">
                         <div style="font-weight: bold; font-size: 11px;">Auditor (Level II)</div>
                         <div class="signature-line">
+                            <!-- KEINE LINIE - NUR PLATZ FÜR UNTERSCHRIFT -->
                         </div>
                     </div>
                     
                     <div class="signature-box">
                         <div style="font-weight: bold; font-size: 11px;">NDT Expert (Level III)</div>
                         <div class="signature-line">
+                            <!-- KEINE LINIE - NUR PLATZ FÜR UNTERSCHRIFT -->
                         </div>
                     </div>
                 </div>
                 <div style="font-size: 10px; text-align: center">
         <div>Erstellt: ${new Date().toLocaleDateString('de-DE')} ${new Date().toLocaleTimeString('de-DE', {hour: '2-digit', minute:'2-digit'})}</div>
-	<div>Nächste Prüfung fällig: ${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('de-DE')}</div>
+        <div>Nächste Prüfung fällig: ${new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toLocaleDateString('de-DE')}</div>
                 
                 <!-- FOOTER -->
                 <div style="font-size: 10px; color: #666; text-align: center; border-top: 1px solid #ccc; padding-top: 8px;">
@@ -3700,6 +3826,29 @@
             `;
             document.getElementById('reportOverlay').style.display = 'block';
             document.body.style.overflow = 'hidden';
+        }
+
+        // Neue Hilfsfunktion: Bilder zu einer Frage im Bericht rendern (GRÖßER)
+        function renderQuestionImagesInReport(question) {
+            if (!question.images || question.images.length === 0) {
+                return '';
+            }
+            
+            let imagesHTML = '<div style="margin-top: 10px;">';
+            imagesHTML += '<div style="display: flex; flex-wrap: wrap; gap: 15px;">';
+            
+            question.images.forEach((image, index) => {
+                imagesHTML += `
+                    <div style="border: 1px solid #ccc; padding: 5px; background: white; text-align: center;">
+                        <img src="${image}" 
+                             alt="" 
+                             style="max-width: 300px; max-height: 300px; object-fit: contain; display: block;">
+                    </div>
+                `;
+            });
+            
+            imagesHTML += '</div></div>';
+            return imagesHTML;
         }
 
         async function showAuthorization() {
@@ -3807,7 +3956,7 @@ eine Gültigkeit von 12 Monaten.</strong><br><br><em>The named person has demons
             let authorizationHTML = `
                 <div class="authorization-header">
                     <!-- LOGO OBEN RECHTS -->
-                    <div style="position: absolute; top: 15px; right: 15px; text-align: right;">
+                    <div style="position: absolute; top: -5px; right: 1px; text-align: right;">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Schaeffler_logo.svg" 
                              alt="Schaeffler Logo" 
                              style="height: 7mm; width: auto; max-width: 40mm;">
