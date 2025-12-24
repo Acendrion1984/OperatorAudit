@@ -1,0 +1,95 @@
+/* KOPFDATEN SECTION */
+.header-section {
+    background: #f8f9fa;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.header-section h3 {
+    color: #2c3e50;
+    margin: 0;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 0.85em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-header-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 8px;
+    font-size: 0.85em;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 60px;
+}
+
+.header-content {
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.header-content.collapsed {
+    max-height: 0;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.header-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 8px;
+    padding: 10px;
+}
+
+.header-group {
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.header-group h4 {
+    color: #2c3e50;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 3px;
+    font-size: 0.9em;
+}
+
+.header-input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 0.8em;
+    margin-bottom: 6px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.header-input:last-child {
+    margin-bottom: 0;
+}
+
+/* MOBILE HEADER - KOMPAKT */
+.mobile-header-section.collapsed {
+    padding: 2px;
+}
+
+.mobile-header-section.collapsed h3 {
+    padding: 4px 6px;
+    font-size: 0.75em;
+    min-height: 24px;
+}

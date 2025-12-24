@@ -1,0 +1,69 @@
+/* AUDIT AUSWAHL */
+.audit-selection {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.audit-selection h2 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+}
+
+.audit-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.audit-btn {
+    padding: 12px 8px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.audit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.audit-btn.wirbelstrom { background: #3498db; }
+.audit-btn.magnetpulver { background: #e74c3c; }
+.audit-btn.nital { background: #2ecc71; }
+.audit-btn.ultraschall { background: #9b59b6; }
+
+.audit-btn .btn-icon {
+    font-size: 1.6em;
+    margin-bottom: 6px;
+}
+
+.audit-btn .btn-progress {
+    margin-top: 4px;
+    font-size: 0.7em;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 6px;
+    border-radius: 8px;
+    min-width: 35px;
+}
+
+.audit-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.audit-btn.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}

@@ -1,0 +1,342 @@
+/* DARK MODE */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    
+    .container {
+        background: #1e1e1e;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    
+    header {
+        border-bottom-color: #444;
+    }
+    
+    h1 {
+        color: #ffffff;
+    }
+    
+    .subtitle {
+        color: #b0b0b0;
+    }
+    
+    /* MODAL DARK MODE */
+    .custom-modal-content {
+        background: #2d2d2d;
+        color: #e0e0e0;
+    }
+    
+    /* AUDIT BUTTONS DARK MODE */
+    .audit-btn.wirbelstrom { 
+        background: #2980b9;
+        color: white;
+    }
+    .audit-btn.magnetpulver { 
+        background: #c0392b;
+        color: white;
+    }
+    .audit-btn.nital { 
+        background: #27ae60;
+        color: white;
+    }
+    .audit-btn.ultraschall { 
+        background: #8e44ad;
+        color: white;
+    }
+    .audit-btn.disabled {
+        opacity: 0.4;
+        background: #555;
+    }
+    
+    .audit-btn .btn-progress {
+        background: rgba(255,255,255,0.1);
+    }
+    
+    /* CONTROLS DARK MODE */
+    .btn-back { background: #666; color: white; }
+    .btn-export { background: #219653; color: white; }
+    .btn-audit-load { background: #2980b9; color: white; }
+    .btn-authorization { background: #8e44ad; color: white; }
+    .btn-report { background: #d35400; color: white; }
+    .btn-desktop { background: #7f8c8d; color: white; }
+    .btn-danger { background: #c0392b; color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    
+    /* STATUSLEISTE DARK MODE */
+    .audit-status {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+    
+    .status-text {
+        color: #ffffff;
+    }
+    
+    .status-text strong {
+        color: #3498db;
+    }
+    
+    .progress-bar {
+        background: #333;
+    }
+    
+    .progress-text {
+        color: #b0b0b0;
+    }
+    
+    /* KOPFDATEN SECTION DARK MODE */
+    .header-section {
+        background: #2d2d2d;
+        border-color: #2980b9;
+    }
+    
+    .header-section h3 {
+        color: #ffffff !important;
+        font-weight: 600;
+    }
+    
+    .header-group {
+        background: #252525;
+        border-color: #444;
+    }
+    
+    .header-group h4 {
+        color: #ffffff;
+        border-bottom-color: #444;
+    }
+    
+    .header-input {
+        background: #333;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+    
+    .header-input::placeholder {
+        color: #888;
+    }
+    
+    /* FRAGEN UND SECTIONS DARK MODE */
+    .section {
+        border-color: #444;
+    }
+    
+    .section-header {
+        background: #2c3e50;
+    }
+    
+    .section-header:hover {
+        background: #34495e;
+    }
+    
+    .question {
+        background: #252525;
+        border-left-color: #666;
+    }
+    
+    .question.ok { 
+        border-left-color: #27ae60; 
+        background: rgba(39, 174, 96, 0.1);
+    }
+    
+    .question.not-ok { 
+        border-left-color: #e74c3c; 
+        background: rgba(231, 76, 60, 0.1);
+    }
+    
+    .question-id {
+        background: #3498db;
+        color: white !important;
+    }
+    
+    .english-translation {
+        color: #b0b0b0;
+        border-left-color: #666;
+    }
+    
+    /* JA/NEIN BUTTONS DARK MODE */
+    .verdict-btn.ok {
+        background: rgba(39, 174, 96, 0.1);
+        color: #2ecc71;
+        border-color: #27ae60;
+    }
+    
+    .verdict-btn.ok.selected {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .verdict-btn.not-ok {
+        background: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+        border-color: #e74c3c;
+    }
+    
+    .verdict-btn.not-ok.selected {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    /* KOMMENTARFELDER DARK MODE */
+    .comment-label {
+        color: #ffffff;
+    }
+    
+    .comment {
+        background: #333;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+    
+    .comment::placeholder {
+        color: #888;
+    }
+    
+    /* BILD-UPLOAD DARK MODE */
+    .image-upload-section {
+        background: rgba(52, 152, 219, 0.05);
+        border-color: #3498db;
+    }
+    
+    .image-upload-section h4 {
+        color: #ffffff;
+    }
+    
+    .file-input-label {
+        background: #2980b9;
+        color: white;
+    }
+    
+    .image-preview-item {
+        border-color: #666;
+        background: #333;
+    }
+    
+    .remove-image {
+        background: #c0392b;
+        color: white;
+    }
+    
+    /* GESAMTERGEBNIS DARK MODE */
+    .final-result.passed {
+        background: rgba(39, 174, 96, 0.2);
+        color: #2ecc71;
+        border-color: #27ae60;
+    }
+    
+    .final-result.failed {
+        background: rgba(231, 76, 60, 0.2);
+        color: #ff6b6b;
+        border-color: #e74c3c;
+    }
+    
+    .final-result.warning {
+        background: rgba(243, 156, 18, 0.2);
+        color: #f1c40f;
+        border-color: #f39c12;
+    }
+    
+    /* MOBILE NAVIGATION DARK MODE */
+    .mobile-nav {
+        border-top-color: #444;
+    }
+    
+    .mobile-nav button {
+        background: #666;
+        color: white;
+    }
+    
+    #mobileCounter {
+        color: #ffffff;
+    }
+    
+    /* KATEGORIEN-BUTTONS MOBILE DARK MODE */
+    .mobile-section-selector {
+        background: #2d2d2d;
+    }
+    
+    .section-btn {
+        background: #2980b9;
+        color: white;
+    }
+    
+    .section-btn.active {
+        background: #3498db;
+        font-weight: bold;
+    }
+    
+    /* BERICHTSANZEIGE DARK MODE - IMMER HELL BLEIBEN */
+    .report-overlay {
+        background: rgba(0,0,0,0.95);
+    }
+    
+    .report-container,
+    #authorizationContainer {
+        background: white !important;
+        color: #000 !important;
+    }
+
+    .report-action-btn {
+        background: #2980b9 !important;
+        color: white !important;
+    }
+    
+    .report-action-btn.print-btn {
+        background: #219653 !important;
+    }
+    
+    .report-action-btn.close-btn {
+        background: #c0392b !important;
+    }
+    
+    .report-header h2 {
+        color: #000 !important;
+    }
+    
+    .company-info {
+        color: #333 !important;
+    }
+    
+    .person-table th {
+        background: #f0f0f0 !important;
+    }
+    
+    .details-table td:first-child {
+        background: #f9f9f9 !important;
+    }
+    
+    .question-item.ok {
+        background: #f0fff0 !important;
+    }
+    
+    .question-item.not-ok {
+        background: #fff0f0 !important;
+    }
+    
+    .question-id {
+        color: #000 !important;
+    }
+    
+    .authorization-header h1 {
+        color: #000 !important;
+    }
+    
+    .authorization-text-box {
+        background: #f9f9f9 !important;
+    }
+    
+    /* FOOTER DARK MODE */
+    footer {
+        border-top-color: #444;
+        color: #b0b0b0;
+    }
+    
+    .creator-info {
+        color: #ffffff;
+    }
+    
+    .version-info {
+        color: #888;
+    }
+}

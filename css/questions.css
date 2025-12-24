@@ -1,0 +1,251 @@
+/* FRAGEN UND SECTIONS */
+.section {
+    margin-bottom: 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.section-header {
+    background: #34495e;
+    color: white;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.section-header:hover {
+    background: #2c3e50;
+}
+
+.section-header h2 { 
+    margin: 0; 
+    font-size: 1em;
+}
+
+.section-header span {
+    transition: transform 0.3s;
+}
+
+.section.expanded .section-header span {
+    transform: rotate(90deg);
+}
+
+.section-content {
+    padding: 10px;
+    display: none;
+}
+
+.section.expanded .section-content { 
+    display: block; 
+    animation: fadeIn 0.3s ease-out;
+}
+
+.question {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #95a5a6;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.question.ok { border-left-color: #27ae60; background: #f0fff4; }
+.question.not-ok { border-left-color: #e74c3c; background: #fff0f0; }
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.question-text { 
+    flex: 1; 
+    font-weight: 500;
+    font-size: 1.25em;
+    line-height: 1.4;
+}
+
+.question-id {
+    background: #3498db;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 1.25em;
+    margin-left: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.english-translation {
+    font-style: italic;
+    color: #666;
+    font-size: 1.0em;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+
+/* Ja/Nein Buttons */
+.verdict-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.verdict-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.verdict-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.verdict-btn.ok {
+    background: #e8f6f3;
+    color: #27ae60;
+    border: 2px solid #27ae60;
+}
+
+.verdict-btn.ok.selected {
+    background: #27ae60;
+    color: white;
+}
+
+.verdict-btn.not-ok {
+    background: #ffebee;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+}
+
+.verdict-btn.not-ok.selected {
+    background: #e74c3c;
+    color: white;
+}
+
+.comment-section {
+    margin-bottom: 10px;
+}
+
+.comment-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.85em;
+}
+
+.comment {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+    font-size: 0.85em;
+    box-sizing: border-box;
+}
+
+/* Bild-Upload */
+.image-upload-section {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px dashed #3498db;
+}
+
+.image-upload-section h4 {
+    color: #2c3e50;
+    margin-bottom: 6px;
+    font-size: 0.85em;
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.file-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #3498db;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-preview-item {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
