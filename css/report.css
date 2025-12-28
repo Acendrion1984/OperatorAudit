@@ -125,7 +125,6 @@
 }
 
 .details-table td:first-child {
-    font-weight: bold;
     width: 25%;
     background: #f9f9f9 !important;
 }
